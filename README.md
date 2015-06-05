@@ -76,7 +76,7 @@ module AppName.Users {
         }
 
         public activate(context: Yo.IActivationContext): void {
-            Yo.Http.get('/user' + context.routeData['userId'], xhr => {
+            Yo.Http.get('/user/' + context.routeData['userId'], xhr => {
                 context.render(xhr.responseBody);
                 context.resolve();
             });
