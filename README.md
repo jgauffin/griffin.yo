@@ -31,9 +31,9 @@ Supports:
         <script src="Yo.js" type="text/javascript"></script>
         <script type="text/javascript">
             var spa = new Griffin.Yo.Spa('AppName');
-            spa.map('', 'home/index');
-            spa.map('user/:id', 'users/details');
-            spa.map('users/', 'users/list');
+            spa.mapRoute('', 'home/index');
+            spa.mapRoute('user/:id', 'users/details');
+            spa.mapRoute('users/', 'users/list');
             spa.run();
         </script>
     </body>
@@ -78,7 +78,7 @@ module AppName.Users {
         }
 
         public activate(context: Yo.IActivationContext): void {
-            Yo.Http.get('/user/' + context.routeData['userId'], xhr => {
+            Yo.Http.get('/user/' + context.routeData['id'], xhr => {
                 context.render(xhr.responseBody);
                 context.resolve();
             });
