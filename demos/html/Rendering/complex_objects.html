@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Demo</title>
+    </head>
+    <body>
+        <div id="MyView">
+            <h2 id="FirstName"></h2>
+            <div data-name="Address">
+                <span data-name="PostalCode"></span>
+                <span id="City"></span>
+            </div>
+        </div>
+        <script src="../../../source/Griffin.Yo.js"></script>
+        <script type="text/javascript">
+            var Yo = Griffin.Yo;
+            
+            var data = { FirstName: "Jonas",
+                         Address: {
+                            City: "Falun",
+                            PostalCode: "791 00"
+                        }
+                       };
+            
+            Yo.G.render('MyView', data);
+            
+        </script>
+    </body>
+</html>

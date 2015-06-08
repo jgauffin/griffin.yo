@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Demo</title>
+    </head>
+    <body>
+        <div id="MyView">
+            <h2 id="Title"></h2>
+            <table>
+                <tr data-name="Items">
+                    <td data-name="Name"></td>
+                    <td data-name="Address">
+                        <span data-name="Postal"></span>
+                        <span data-name="City"></span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <script src="../../../source/Griffin.Yo.js"></script>
+        <script type="text/javascript">
+            var Yo = Griffin.Yo;
+            
+            //complex objects in arrays are no problem
+            Yo.G.render('MyView', { Title: 'Hello world', Items: [{ Name: 'Jonas', Address: { Postal: 12345, City: "Falun" }}, { Name: 'Tom', Address: { Postal: 54321, City: "Stockholm" }}] });
+            
+        </script>
+    </body>
+</html>

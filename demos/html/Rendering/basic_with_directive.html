@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Demo</title>
+    </head>
+    <body>
+        <div id="MyView">
+            <h2 id="Name"></h2>
+        </div>
+        
+        <button id="withHtml">Render with HTML instead</button>
+        <script src="../../../source/Griffin.Yo.js"></script>
+        <script type="text/javascript">
+            var Yo = Griffin.Yo;
+            
+            var directives = {  Name: {
+                                    text(value) { return value + ' <span>(HTML as text)</span>'; },
+                                    style(value) { return 'color: red'; },
+                                    class(value) { return 'someClass'; }
+                                }
+                            };
+            Yo.G.render('MyView', { Name: 'Arne' }, directives);
+            
+            
+            // use "html" to allow HTML in the data.
+            document.getElementById('withHtml').addEventListener('click', function(e) {
+                e.preventDefault();
+                Yo.G.render('MyView', { Name: 'Arne' }, { Name: { html(value) { return value + ' <span>(HTML as text)</span>'; } } });
+            });
+        </script>
+    </body>
+</html>

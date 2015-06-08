@@ -1,0 +1,14 @@
+﻿{
+    "Name": 'Arne',
+    "Users": [
+        { "Id": 1, "UserName": 'Kalle' },
+        { "Id": 2, "UserName": 'Stefan' }
+    ],
+    "Address": {
+        "Postal": {
+            "ZipCode": 1234,
+            "City": 'Avesta',
+            "Name": "Shit"
+        }
+    }
+}
