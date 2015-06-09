@@ -92,3 +92,4 @@ module AppName.Users {
 ```
 
 
+*There are more documentation in the wiki*
