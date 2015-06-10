@@ -246,6 +246,26 @@
             }
         }
 
+        static getIdentifier(e: HTMLElement): string {
+            if (e.id)
+                return e.id;
+
+            var name = e.getAttribute("name");
+            if (name != null)
+                return name;
+
+            name = e.getAttribute("data-name");
+            if (name != null)
+                return name;
+
+            var attrs = '';
+            for (var i = 0; i < e.attributes.length; i++) {
+                attrs = attrs + e.attributes[i].name + "=" + e.attributes[i].value + ",";
+            }
+
+            return e.tagName + "[" + attrs.substr(0,attrs.length-1) + "]";
+        }
+
         //credits: http://stackoverflow.com/a/2441972/70386
         public static getConstructor(appName: string, viewModelModuleAndName: string): any {
             const nameParts = viewModelModuleAndName.split(".");
@@ -271,7 +291,7 @@
 
 
                 if (typeof foundName === "undefined")
-                    throw new Error(`Could not find "#${nameParts[i]}" from viewModel name, complete name: "#${viewModelModuleAndName}".`);
+                    throw new Error(`Could not find "${nameParts[i]}" from viewModel name, complete name: "${appName}.${viewModelModuleAndName}".`);
 
                 fn = fn[foundName];
             }
@@ -369,6 +389,7 @@
                         r.render(data, directives);
                     },
                     renderPartial(selector: string, data: any, directives?: any) {
+                        //const selectorStr = `[${this.bindAttributeName}="${propertyName}"],[name="${propertyName}"],#${propertyName}`;
                         const part = viewElem.querySelector(selector);
                         if (!part) {
                             throw new Error(`Failed to find partial '${selector}'.`);
@@ -663,6 +684,33 @@
 
     }
 
+    export class ElementCache {
+        private static cache = [];
+        private static expando = 'data' + +new Date();
+
+        private static ensureSlot(elem: HTMLElement):number {
+            var cacheIndex = elem[this.expando],
+                nextCacheIndex = this.cache.length;
+            if (!cacheIndex) {
+                console.log('loading new item');
+                cacheIndex = elem[this.expando] = nextCacheIndex;
+                this.cache[cacheIndex] = {};
+            }
+
+            console.log('index', cacheIndex, this.cache);
+            return cacheIndex;
+        }
+
+        public static get(elem: HTMLElement, key: string) {
+            var index = this.ensureSlot(elem);
+            return this.cache[index][key];
+        }
+
+        public static set(elem: HTMLElement, key: string, value: any) {
+            var index = this.ensureSlot(elem);
+            this.cache[index][key] = value;
+        }
+    }
 
     /**
      * Renders views (i.e. takes objects/JSON and identifies where each property should be rendered in the view).
@@ -731,7 +779,7 @@
                     const selectorStr = `[${this.bindAttributeName}="${propertyName}"],[name="${propertyName}"],#${propertyName}`;
                     const childElements = element.querySelectorAll(selectorStr);
                     if (childElements.length === 0) {
-                        //console.log("[Element: ", element, '] Failed to find child ' + propertyName + ", current position: ", lineage);
+                        console.log("[Element: ", element, '] Failed to find child ' + propertyName + ", current position: ", lineage);
                     }
                     for (let i = 0; i < childElements.length; i++) {
                         const childElement = <HTMLElement>childElements[i];
@@ -742,18 +790,45 @@
         }
 
 
-        private renderArray(targetElement: HTMLElement, array: any, lineage: string, parentData: any, directives: any) {
-            var template: HTMLElement;
-            if (targetElement["Yo.template"]) {
-                template = targetElement["Yo.template"];
-            } else {
-                template = <HTMLElement>targetElement.cloneNode(true);
-                targetElement["Yo.template"] = template;
+        private renderArray(targetElement: HTMLElement, array: any[], lineage: string, parentData: any, directives: any) {
+            if (targetElement == null) {
+                throw new Error("Failed to find rendering target for an array, path: " + lineage);
             }
-            var parent = targetElement.parentElement;
-            parent.removeChild(targetElement);
 
+            var elementId = Doh.getIdentifier(targetElement);
+            var templateContainer;
+            if (targetElement.tagName === 'TBODY'
+                || targetElement.tagName === 'TABLE'
+                || targetElement.tagName === 'OL'
+                || targetElement.tagName === 'UL') {
+                
+                templateContainer = targetElement;
+                targetElement = templateContainer.firstElementChild;
+            } else {
+                templateContainer = targetElement.parentElement;
+            }
 
+            var templateName = 'Yo.Template.' + elementId;
+            var templateStorage = document.getElementById('YoTemplateStorage');
+            if (!templateStorage) {
+                templateStorage = document.createElement('div');
+                templateStorage.style.display = 'none';
+                document.body.appendChild(templateStorage);
+            }
+            
+            var template = templateContainer[templateName];
+            if (!template) {
+                template = <HTMLElement>targetElement.cloneNode(true);
+                template.removeAttribute('data-name');
+                template.removeAttribute('id');
+                template.removeAttribute('name');
+                templateStorage.appendChild(template);
+                templateContainer[templateName] = template;
+                Doh.removeChildren(templateContainer);
+            }
+            Doh.removeChildren(templateContainer);
+            console.log('length', array.length);
+            
             if (directives.hasOwnProperty("text")
                 || directives.hasOwnProperty("html")
                 || directives.hasOwnProperty("value")) {
@@ -763,10 +838,7 @@
             var index = 0;
             array.forEach(child => {
                 var ourNode = <HTMLElement>template.cloneNode(true);
-                parent.appendChild(ourNode);
-
-
-                //directives are for the children and not for this item
+                templateContainer.appendChild(ourNode);
                 this.renderItem(child, ourNode, lineage + "[" + (index++) + "]", parentData, directives);
             });
         }
