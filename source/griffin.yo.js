@@ -2,6 +2,23 @@ var Griffin;
 (function (Griffin) {
     var Yo;
     (function (Yo) {
+        var ViewScripts = (function () {
+            function ViewScripts() {
+            }
+            ViewScripts.push = function (callback) {
+                console.log('pushing');
+                this.scriptsToRun.push(callback);
+            };
+            ViewScripts.run = function (context) {
+                this.scriptsToRun.forEach(function (item) {
+                    item(context);
+                });
+                this.scriptsToRun = [];
+            };
+            ViewScripts.scriptsToRun = [];
+            return ViewScripts;
+        })();
+        Yo.ViewScripts = ViewScripts;
         ;
         /**
          * Global config for extensibility
@@ -122,6 +139,21 @@ var Griffin;
                     source.remove();
                 }
             };
+            Doh.getIdentifier = function (e) {
+                if (e.id)
+                    return e.id;
+                var name = e.getAttribute("name");
+                if (name != null)
+                    return name;
+                name = e.getAttribute("data-name");
+                if (name != null)
+                    return name;
+                var attrs = '';
+                for (var i = 0; i < e.attributes.length; i++) {
+                    attrs = attrs + e.attributes[i].name + "=" + e.attributes[i].value + ",";
+                }
+                return e.tagName + "[" + attrs.substr(0, attrs.length - 1) + "]";
+            };
             //credits: http://stackoverflow.com/a/2441972/70386
             Doh.getConstructor = function (appName, viewModelModuleAndName) {
                 var nameParts = viewModelModuleAndName.split(".");
@@ -145,7 +177,7 @@ var Griffin;
                         }
                     }
                     if (typeof foundName === "undefined")
-                        throw new Error("Could not find \"#" + nameParts[i] + "\" from viewModel name, complete name: \"#" + viewModelModuleAndName + "\".");
+                        throw new Error("Could not find \"" + nameParts[i] + "\" from viewModel name, complete name: \"" + appName + "." + viewModelModuleAndName + "\".");
                     fn = fn[foundName];
                 }
                 if (typeof fn !== "function") {
@@ -178,8 +210,15 @@ var Griffin;
                 var links = viewElement.querySelectorAll("a");
                 for (var i = 0; i < links.length; i++) {
                     var link = links[i];
+                    var pos = link.href.indexOf('#');
+                    if (pos === -1 || link.href.substr(pos + 1, 1) !== '/') {
+                        continue;
+                    }
                     for (var dataName in routeData) {
                         if (routeData.hasOwnProperty(dataName)) {
+                            var after = RouteRunner.replaceAll(link.href, ":" + dataName, routeData[dataName]);
+                            var before = link.href;
+                            console.log('replacing', before, " => ", after);
                             link.href = RouteRunner.replaceAll(link.href, ":" + dataName, routeData[dataName]);
                         }
                     }
@@ -192,7 +231,7 @@ var Griffin;
                     var target = nav.getAttribute("data-navigation");
                     var targetElem = document.getElementById(target);
                     if (!targetElem)
-                        throw new Error("Failed to find target element '" + target + "' for navigation '" + nav.innerHTML);
+                        throw new Error("Failed to find target element '" + target + "' for navigation '" + nav.innerHTML + "'");
                     Doh.removeChildren(targetElem);
                     Doh.moveChildren(nav, targetElem);
                 }
@@ -203,6 +242,7 @@ var Griffin;
                     var viewElem = document.createElement("div");
                     viewElem.className = "ViewContainer";
                     viewElem.innerHTML = _this.html;
+                    console.log('route', ctx.routeData);
                     _this.applyRouteDataToLinks(viewElem, ctx.routeData);
                     _this.moveNavigationToMain(viewElem);
                     var viewParent = document.getElementById("YoView");
@@ -226,6 +266,7 @@ var Griffin;
                             r.render(data, directives);
                         },
                         renderPartial: function (selector, data, directives) {
+                            //const selectorStr = `[${this.bindAttributeName}="${propertyName}"],[name="${propertyName}"],#${propertyName}`;
                             var part = viewElem.querySelector(selector);
                             if (!part) {
                                 throw new Error("Failed to find partial '" + selector + "'.");
@@ -240,6 +281,11 @@ var Griffin;
                                 viewParent.removeChild(viewParent.firstElementChild);
                             }
                             viewParent.appendChild(viewElem);
+                            var scripts = viewElem.getElementsByTagName('script');
+                            for (var i = 0; i < scripts.length; i++) {
+                                eval(scripts[i].innerText);
+                            }
+                            ViewScripts.run(activationContext);
                         },
                         reject: function () {
                             //TODO: Fail?
@@ -291,6 +337,22 @@ var Griffin;
             };
             return RouteRunner;
         })();
+        var LocalCache = (function () {
+            function LocalCache() {
+            }
+            LocalCache.set = function (key, value) {
+                if (!window.hasOwnProperty('Yo.LocalCache'))
+                    window['Yo.LocalCache'] = {};
+                window['Yo.LocalCache'][key] = value;
+            };
+            LocalCache.get = function (key) {
+                if (!window.hasOwnProperty('Yo.LocalCache'))
+                    return null;
+                return window['Yo.LocalCache'][key];
+            };
+            return LocalCache;
+        })();
+        Yo.LocalCache = LocalCache;
         /**
          * Facade for the SPA handling
          */
@@ -335,8 +397,12 @@ var Griffin;
                     url = url.substr(1);
                 }
                 window.addEventListener("hashchange", function () {
-                    //no shebang pls.
-                    var changedUrl = window.location.hash.substring(1);
+                    // allow regular hash links on pages
+                    // by required hashbangs (#/!) or just hash'slash'em (#/)
+                    if (window.location.hash.substr(1, 1) !== '/')
+                        return;
+                    // remove shebang
+                    var changedUrl = window.location.hash.substr(2);
                     if (changedUrl.substr(0, 1) === "!") {
                         changedUrl = changedUrl.substr(1);
                     }
@@ -478,6 +544,32 @@ var Griffin;
             return Router;
         })();
         Yo.Router = Router;
+        var ElementCache = (function () {
+            function ElementCache() {
+            }
+            ElementCache.ensureSlot = function (elem) {
+                var cacheIndex = elem[this.expando], nextCacheIndex = this.cache.length;
+                if (!cacheIndex) {
+                    console.log('loading new item');
+                    cacheIndex = elem[this.expando] = nextCacheIndex;
+                    this.cache[cacheIndex] = {};
+                }
+                console.log('index', cacheIndex, this.cache);
+                return cacheIndex;
+            };
+            ElementCache.get = function (elem, key) {
+                var index = this.ensureSlot(elem);
+                return this.cache[index][key];
+            };
+            ElementCache.set = function (elem, key, value) {
+                var index = this.ensureSlot(elem);
+                this.cache[index][key] = value;
+            };
+            ElementCache.cache = [];
+            ElementCache.expando = 'data' + +new Date();
+            return ElementCache;
+        })();
+        Yo.ElementCache = ElementCache;
         /**
          * Renders views (i.e. takes objects/JSON and identifies where each property should be rendered in the view).
          */
@@ -536,38 +628,70 @@ var Griffin;
                         if (directives) {
                             childDirectives = directives[propertyName];
                         }
-                        var selectorStr = "[" + this.bindAttributeName + "=\"" + propertyName + "\"],[name=\"" + propertyName + "\"],#" + propertyName;
+                        var selectorStr = "[" + this.bindAttributeName + "=\"" + propertyName + "\"],[data-unless=\"" + propertyName + "\"],[name=\"" + propertyName + "\"],#" + propertyName;
                         var childElements = element.querySelectorAll(selectorStr);
                         if (childElements.length === 0) {
+                            var lineage2 = lineage === '' ? propertyName : lineage + "." + propertyName;
                         }
                         for (var i = 0; i < childElements.length; i++) {
                             var childElement = childElements[i];
-                            this.renderItem(item, childElement, lineage + "/" + propertyName, data, childDirectives);
+                            var lineage2 = lineage === '' ? propertyName : lineage + "." + propertyName;
+                            //console.log(lineage2);
+                            this.renderItem(item, childElement, lineage2, data, childDirectives);
                         }
                     }
                 }
             };
             ViewRenderer.prototype.renderArray = function (targetElement, array, lineage, parentData, directives) {
                 var _this = this;
-                var template;
-                if (targetElement["Yo.template"]) {
-                    template = targetElement["Yo.template"];
+                if (targetElement == null) {
+                    throw new Error("Failed to find rendering target for an array, path: " + lineage);
+                }
+                if (targetElement.hasAttribute("data-unless")) {
+                    if (array.length === 0) {
+                        targetElement.style.display = '';
+                    }
+                    else {
+                        targetElement.style.display = 'none';
+                    }
+                    return;
+                }
+                var elementId = Doh.getIdentifier(targetElement);
+                var templateContainer;
+                if (targetElement.tagName === 'TR'
+                    || targetElement.tagName === 'LI') {
+                    templateContainer = targetElement.parentElement;
                 }
                 else {
+                    templateContainer = targetElement;
+                    targetElement = templateContainer.firstElementChild;
+                }
+                var templateName = 'Yo.Template.' + elementId;
+                var templateStorage = document.getElementById('YoTemplateStorage');
+                if (!templateStorage) {
+                    templateStorage = document.createElement('div');
+                    templateStorage.style.display = 'none';
+                    document.body.appendChild(templateStorage);
+                }
+                var template = templateContainer[templateName];
+                if (!template) {
                     template = targetElement.cloneNode(true);
-                    targetElement["Yo.template"] = template;
+                    template.removeAttribute('id');
+                    templateStorage.appendChild(template);
+                    templateContainer[templateName] = template;
+                    Doh.removeChildren(templateContainer);
+                    console.log(templateContainer);
                 }
-                var parent = targetElement.parentElement;
-                parent.removeChild(targetElement);
-                if (directives.hasOwnProperty("text")
-                    || directives.hasOwnProperty("html")
-                    || directives.hasOwnProperty("value")) {
-                }
+                Doh.removeChildren(templateContainer);
+                //if (directives && (directives.hasOwnProperty("text")
+                //    || directives.hasOwnProperty("html")
+                //    || directives.hasOwnProperty("value"))) {
+                //}
                 var index = 0;
                 array.forEach(function (child) {
                     var ourNode = template.cloneNode(true);
-                    parent.appendChild(ourNode);
-                    //directives are for the children and not for this item
+                    templateContainer.appendChild(ourNode);
+                    //console.log(ourNode, child);
                     _this.renderItem(child, ourNode, lineage + "[" + (index++) + "]", parentData, directives);
                 });
             };
@@ -584,18 +708,18 @@ var Griffin;
                         if (typeof currentDirective === "undefined" || typeof currentDirective.apply === "undefined")
                             throw new Error("Directive must be a function, maybe you specified your directive incorrectly? Path: " + lineage);
                         if (directiveName === "text") {
-                            e.innerText = currentDirective.apply(e, [item, parentData]);
+                            e.innerText = currentDirective.apply(e, [item, parentData, lineage]);
                             isValueSet = true;
                         }
                         else if (directiveName === "html") {
-                            e.innerHTML = currentDirective.apply(e, [item, parentData]);
+                            e.innerHTML = currentDirective.apply(e, [item, parentData, lineage]);
                             isValueSet = true;
                         }
                         else {
                             if (directiveName === "value") {
                                 isValueSet = true;
                             }
-                            var value = currentDirective.apply(e, [item, parentData]);
+                            var value = currentDirective.apply(e, [item, parentData, lineage]);
                             e.setAttribute(directiveName, value);
                         }
                     }

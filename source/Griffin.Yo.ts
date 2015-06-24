@@ -1,9 +1,20 @@
 ﻿module Griffin.Yo {
-
-
+    export class ViewScripts {
+        static scriptsToRun = [];
+        static push(callback: (ctx: IActivationContext) => void) {
+            console.log('pushing');
+            this.scriptsToRun.push(callback);
+        }
+        static run(context: IActivationContext) {
+            this.scriptsToRun.forEach(item => {
+                item(context);
+            });
+            this.scriptsToRun = [];
+        }
+    }
     export interface IRouteExecutionContext {
         routeData: any;
-        route: IRoute,
+        route: IRoute;
         target?: HTMLElement;
     };
 
@@ -214,7 +225,7 @@
     /**
      * Global mappings
      */
-   export class G {
+    export class G {
         static select = new Selector();
         static handle = new EventMapper();
 
@@ -263,7 +274,7 @@
                 attrs = attrs + e.attributes[i].name + "=" + e.attributes[i].value + ",";
             }
 
-            return e.tagName + "[" + attrs.substr(0,attrs.length-1) + "]";
+            return e.tagName + "[" + attrs.substr(0, attrs.length - 1) + "]";
         }
 
         //credits: http://stackoverflow.com/a/2441972/70386
@@ -333,9 +344,17 @@
         private applyRouteDataToLinks(viewElement: HTMLElement, routeData: any) {
             const links = viewElement.querySelectorAll("a");
             for (let i = 0; i < links.length; i++) {
-                const link = <HTMLLinkElement>links[i];
+                const link = <HTMLAnchorElement>links[i];
+
+                let pos = link.href.indexOf('#');
+                if (pos === -1 || link.href.substr(pos + 1, 1) !== '/') {
+                    continue;
+                }
                 for (let dataName in routeData) {
                     if (routeData.hasOwnProperty(dataName)) {
+                        var after = RouteRunner.replaceAll(link.href, `:${dataName}`, routeData[dataName]);
+                        var before = link.href;
+                        console.log('replacing', before, " => ", after);
                         link.href = RouteRunner.replaceAll(link.href, `:${dataName}`, routeData[dataName]);
                     }
                 }
@@ -350,7 +369,7 @@
                 const target = nav.getAttribute("data-navigation");
                 const targetElem = document.getElementById(target);
                 if (!targetElem)
-                    throw new Error(`Failed to find target element '${target}' for navigation '${nav.innerHTML}`);
+                    throw new Error(`Failed to find target element '${target}' for navigation '${nav.innerHTML}'`);
                 Doh.removeChildren(targetElem);
                 Doh.moveChildren(nav, targetElem);
             }
@@ -361,6 +380,7 @@
                 var viewElem = document.createElement("div");
                 viewElem.className = "ViewContainer";
                 viewElem.innerHTML = this.html;
+                console.log('route', ctx.routeData);
                 this.applyRouteDataToLinks(viewElem, ctx.routeData);
                 this.moveNavigationToMain(viewElem);
 
@@ -371,7 +391,7 @@
                 }
 
 
-//add script
+                //add script
                 var scriptElem = document.createElement("script");
                 scriptElem.setAttribute("type", "text/javascript");
                 viewParent.appendChild(scriptElem);
@@ -406,6 +426,11 @@
                         }
 
                         viewParent.appendChild(viewElem);
+                        var scripts = viewElem.getElementsByTagName('script');
+                        for (let i = 0; i < scripts.length; i++) {
+                            eval(scripts[i].innerText);
+                        }
+                        ViewScripts.run(activationContext);
                     },
                     reject() {
                         //TODO: Fail?
@@ -414,12 +439,11 @@
                     select: new Selector(viewElem)
                 };
 
-
                 this.viewModel.activate(activationContext);
             });
         }
 
-        
+
 
         private ensureResources(callback: () => void) {
             var bothPreloaded = true;
@@ -461,6 +485,21 @@
         }
     }
 
+    export class LocalCache {
+        public static set(key: string, value: any) {
+            if (!window.hasOwnProperty('Yo.LocalCache'))
+                window['Yo.LocalCache'] = {};
+            window['Yo.LocalCache'][key] = value;
+        }
+
+        public static get(key: string): any {
+            if (!window.hasOwnProperty('Yo.LocalCache'))
+                return null;
+
+            return window['Yo.LocalCache'][key];
+        }
+    }
+
     /**
      * Facade for the SPA handling
      */
@@ -469,10 +508,10 @@
         private handlers: RouteRunner[] = [];
         private basePath = "";
 
-/**
-         * Create Spa.
-         * @param applicationName Only used for namespacing of VMs
-         */
+        /**
+                 * Create Spa.
+                 * @param applicationName Only used for namespacing of VMs
+                 */
         constructor(public applicationName: string) {
             this.basePath = window.location.pathname;
         }
@@ -510,8 +549,13 @@
 
             window.addEventListener("hashchange", () => {
 
-                //no shebang pls.
-                var changedUrl = window.location.hash.substring(1);
+                // allow regular hash links on pages
+                // by required hashbangs (#/!) or just hash'slash'em (#/)
+                if (window.location.hash.substr(1, 1) !== '/')
+                    return;
+
+                // remove shebang
+                var changedUrl = window.location.hash.substr(2);
                 if (changedUrl.substr(0, 1) === "!") {
                     changedUrl = changedUrl.substr(1);
                 }
@@ -688,7 +732,7 @@
         private static cache = [];
         private static expando = 'data' + +new Date();
 
-        private static ensureSlot(elem: HTMLElement):number {
+        private static ensureSlot(elem: HTMLElement): number {
             var cacheIndex = elem[this.expando],
                 nextCacheIndex = this.cache.length;
             if (!cacheIndex) {
@@ -776,14 +820,17 @@
                     if (directives) {
                         childDirectives = directives[propertyName];
                     }
-                    const selectorStr = `[${this.bindAttributeName}="${propertyName}"],[name="${propertyName}"],#${propertyName}`;
+                    const selectorStr = `[${this.bindAttributeName}="${propertyName}"],[data-unless="${propertyName}"],[name="${propertyName}"],#${propertyName}`;
                     const childElements = element.querySelectorAll(selectorStr);
                     if (childElements.length === 0) {
-                        console.log("[Element: ", element, '] Failed to find child ' + propertyName + ", current position: ", lineage);
+                        let lineage2 = lineage === '' ? propertyName : lineage + "." + propertyName;
+                        //console.log("[Element: ", element, '] Failed to find child ' + propertyName + ", current position: ", lineage2);
                     }
                     for (let i = 0; i < childElements.length; i++) {
                         const childElement = <HTMLElement>childElements[i];
-                        this.renderItem(item, childElement, lineage + "/" + propertyName, data, childDirectives);
+                        let lineage2 = lineage === '' ? propertyName : lineage + "." + propertyName;
+                        //console.log(lineage2);
+                        this.renderItem(item, childElement, lineage2, data, childDirectives);
                     }
                 }
             }
@@ -795,17 +842,23 @@
                 throw new Error("Failed to find rendering target for an array, path: " + lineage);
             }
 
+            if (targetElement.hasAttribute("data-unless")) {
+                if (array.length === 0) {
+                    targetElement.style.display = '';
+                } else {
+                    targetElement.style.display = 'none';
+                }
+                return;
+            }
+
             var elementId = Doh.getIdentifier(targetElement);
             var templateContainer;
-            if (targetElement.tagName === 'TBODY'
-                || targetElement.tagName === 'TABLE'
-                || targetElement.tagName === 'OL'
-                || targetElement.tagName === 'UL') {
-                
+            if (targetElement.tagName === 'TR'
+                || targetElement.tagName === 'LI') {
+                templateContainer = targetElement.parentElement;
+            } else {
                 templateContainer = targetElement;
                 targetElement = templateContainer.firstElementChild;
-            } else {
-                templateContainer = targetElement.parentElement;
             }
 
             var templateName = 'Yo.Template.' + elementId;
@@ -815,30 +868,29 @@
                 templateStorage.style.display = 'none';
                 document.body.appendChild(templateStorage);
             }
-            
+
             var template = templateContainer[templateName];
             if (!template) {
                 template = <HTMLElement>targetElement.cloneNode(true);
-                template.removeAttribute('data-name');
                 template.removeAttribute('id');
-                template.removeAttribute('name');
                 templateStorage.appendChild(template);
                 templateContainer[templateName] = template;
                 Doh.removeChildren(templateContainer);
+                console.log(templateContainer);
             }
             Doh.removeChildren(templateContainer);
-            console.log('length', array.length);
             
-            if (directives.hasOwnProperty("text")
-                || directives.hasOwnProperty("html")
-                || directives.hasOwnProperty("value")) {
+            //if (directives && (directives.hasOwnProperty("text")
+            //    || directives.hasOwnProperty("html")
+            //    || directives.hasOwnProperty("value"))) {
 
-            }
+            //}
 
             var index = 0;
             array.forEach(child => {
                 var ourNode = <HTMLElement>template.cloneNode(true);
                 templateContainer.appendChild(ourNode);
+                //console.log(ourNode, child);
                 this.renderItem(child, ourNode, lineage + "[" + (index++) + "]", parentData, directives);
             });
         }
@@ -859,16 +911,16 @@
                         throw new Error(`Directive must be a function, maybe you specified your directive incorrectly? Path: ${lineage}`);
 
                     if (directiveName === "text") {
-                        e.innerText = currentDirective.apply(e, [item, parentData]);
+                        e.innerText = currentDirective.apply(e, [item, parentData, lineage]);
                         isValueSet = true;
                     } else if (directiveName === "html") {
-                        e.innerHTML = currentDirective.apply(e, [item, parentData]);
+                        e.innerHTML = currentDirective.apply(e, [item, parentData, lineage]);
                         isValueSet = true;
                     } else {
                         if (directiveName === "value") {
                             isValueSet = true;
                         }
-                        const value = currentDirective.apply(e, [item, parentData]);
+                        const value = currentDirective.apply(e, [item, parentData, lineage]);
                         e.setAttribute(directiveName, value);
                     }
                 }
