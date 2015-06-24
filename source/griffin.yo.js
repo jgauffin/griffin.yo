@@ -6,7 +6,6 @@ var Griffin;
             function ViewScripts() {
             }
             ViewScripts.push = function (callback) {
-                console.log('pushing');
                 this.scriptsToRun.push(callback);
             };
             ViewScripts.run = function (context) {
@@ -218,7 +217,6 @@ var Griffin;
                         if (routeData.hasOwnProperty(dataName)) {
                             var after = RouteRunner.replaceAll(link.href, ":" + dataName, routeData[dataName]);
                             var before = link.href;
-                            console.log('replacing', before, " => ", after);
                             link.href = RouteRunner.replaceAll(link.href, ":" + dataName, routeData[dataName]);
                         }
                     }
@@ -242,7 +240,6 @@ var Griffin;
                     var viewElem = document.createElement("div");
                     viewElem.className = "ViewContainer";
                     viewElem.innerHTML = _this.html;
-                    console.log('route', ctx.routeData);
                     _this.applyRouteDataToLinks(viewElem, ctx.routeData);
                     _this.moveNavigationToMain(viewElem);
                     var viewParent = document.getElementById("YoView");
@@ -550,11 +547,9 @@ var Griffin;
             ElementCache.ensureSlot = function (elem) {
                 var cacheIndex = elem[this.expando], nextCacheIndex = this.cache.length;
                 if (!cacheIndex) {
-                    console.log('loading new item');
                     cacheIndex = elem[this.expando] = nextCacheIndex;
                     this.cache[cacheIndex] = {};
                 }
-                console.log('index', cacheIndex, this.cache);
                 return cacheIndex;
             };
             ElementCache.get = function (elem, key) {
@@ -680,7 +675,6 @@ var Griffin;
                     templateStorage.appendChild(template);
                     templateContainer[templateName] = template;
                     Doh.removeChildren(templateContainer);
-                    console.log(templateContainer);
                 }
                 Doh.removeChildren(templateContainer);
                 //if (directives && (directives.hasOwnProperty("text")

@@ -2,7 +2,6 @@
     export class ViewScripts {
         static scriptsToRun = [];
         static push(callback: (ctx: IActivationContext) => void) {
-            console.log('pushing');
             this.scriptsToRun.push(callback);
         }
         static run(context: IActivationContext) {
@@ -354,7 +353,6 @@
                     if (routeData.hasOwnProperty(dataName)) {
                         var after = RouteRunner.replaceAll(link.href, `:${dataName}`, routeData[dataName]);
                         var before = link.href;
-                        console.log('replacing', before, " => ", after);
                         link.href = RouteRunner.replaceAll(link.href, `:${dataName}`, routeData[dataName]);
                     }
                 }
@@ -380,7 +378,6 @@
                 var viewElem = document.createElement("div");
                 viewElem.className = "ViewContainer";
                 viewElem.innerHTML = this.html;
-                console.log('route', ctx.routeData);
                 this.applyRouteDataToLinks(viewElem, ctx.routeData);
                 this.moveNavigationToMain(viewElem);
 
@@ -736,12 +733,10 @@
             var cacheIndex = elem[this.expando],
                 nextCacheIndex = this.cache.length;
             if (!cacheIndex) {
-                console.log('loading new item');
                 cacheIndex = elem[this.expando] = nextCacheIndex;
                 this.cache[cacheIndex] = {};
             }
 
-            console.log('index', cacheIndex, this.cache);
             return cacheIndex;
         }
 
@@ -876,7 +871,6 @@
                 templateStorage.appendChild(template);
                 templateContainer[templateName] = template;
                 Doh.removeChildren(templateContainer);
-                console.log(templateContainer);
             }
             Doh.removeChildren(templateContainer);
             
