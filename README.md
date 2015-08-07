@@ -10,6 +10,7 @@ Supports:
 * Complex views
 * Caching (scripts/views are cached once fetched)
 * Caching of server side data (using standard HTTP headers)
+* HTML Forms to JSON 
 * Spa routing
 
 
@@ -25,7 +26,7 @@ Supports:
         <div id="YoView">
         </div>
         <div class="navigation">
-            <a href="#users/1">Show user</a>
+            <a href="#/users/1">Show user</a>
             <a href="#/">Index</a>
         </div>
         <script src="Yo.js" type="text/javascript"></script>
@@ -46,14 +47,16 @@ Supports:
 <div id="DetailsView">
     <h1 data-name="Name"></h1>
     <table>
-        <tbody>
-            <tr data-name="Users">
+        <tbody data-collection="Users">
+            <tr>
                 <td data-name="Id"></td>
                 <td data-name="UserName"></td>
             </tr>
-
         </tbody>
     </table>
+    <div data-unless="Users">
+        No users have been added.
+    </div>
     <div data-name="Address">
         <div data-name="Attention"></div>
         <div data-name="Postal">
@@ -73,6 +76,7 @@ module AppName.Users {
     import Yo = Griffin.Yo;
 
     export class DetailsViewModel implements Yo.IViewModel {
+
         public getTitle(): string {
             return 'User details';
         }
