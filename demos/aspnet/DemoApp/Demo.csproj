@@ -60,6 +60,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="update_griffin.yo.cmd" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -68,7 +69,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="griffin.yo.js" />
     <Content Include="index.html" />
     <Content Include="Views\Home\Index.html" />
     <Content Include="Views\Users\Details.html" />
@@ -79,6 +79,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Griffin.Yo.ts" />
     <TypeScriptCompile Include="ViewModels\Home\IndexViewModel.ts" />
     <TypeScriptCompile Include="ViewModels\Users\DetailsViewModel.ts" />
   </ItemGroup>
@@ -110,7 +111,11 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>copy "$(SolutionDir)..\..\source\Griffin.Yo.js" "$(ProjectDir)"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>copy "$(SolutionDir)..\..\src\Griffin.Yo.ts" "$(ProjectDir)"</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

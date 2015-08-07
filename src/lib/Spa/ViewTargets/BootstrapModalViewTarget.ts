@@ -1,3 +1,4 @@
+declare var $;
 
 /**
  * Render view into a parent element

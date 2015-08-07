@@ -1,4 +1,4 @@
-﻿/// <reference path="../../../../../source/Griffin.Yo.ts"/> 
+﻿/// <reference path="../../Griffin.Yo.ts"/> 
 
 module DemoApp.Home {
     import Yo = Griffin.Yo;

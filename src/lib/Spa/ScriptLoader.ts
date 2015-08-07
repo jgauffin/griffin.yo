@@ -18,7 +18,7 @@ export class ScriptLoader {
 		}
 
 		var firstScript = <any>this.pendingScripts[0];
-		while (firstScript && firstScript.readyState === 'loaded') {
+		while (firstScript && firstScript.readyState === "loaded") {
 			firstScript.onreadystatechange = null;
 			this.container.appendChild(firstScript);
 
@@ -57,25 +57,25 @@ export class ScriptLoader {
 
 
 	private loadSource(source: string) {
-		if ('async' in ScriptLoader.dummyScriptNode) { // modern browsers
-			let script = document.createElement('script');
+		if ("async" in ScriptLoader.dummyScriptNode) { // modern browsers
+			let script = document.createElement("script");
 			script.async = false;
 			this.pendingScripts.push(script);
-			script.addEventListener('load', e => this.onScriptLoaded(script));
+			script.addEventListener("load", e => this.onScriptLoaded(script));
 			script.src = source;
 			this.container.appendChild(script);
 		}
 		else if (ScriptLoader.dummyScriptNode.readyState) { // IE<10
-			let script = <any>document.createElement('script');
+			let script = <any>document.createElement("script");
 			this.pendingScripts.push(script);
 			script.onreadystatechange = this.stateChange;
 			script.src = source;
 		}
 		else { // fall back to defer
-			let script = document.createElement('script');
+			let script = document.createElement("script");
 			script.defer = true;
 			this.pendingScripts.push(script);
-			script.addEventListener('load', e => this.onScriptLoaded(script));
+			script.addEventListener("load", e => this.onScriptLoaded(script));
 			script.src = source;
 			this.container.appendChild(script);
 			//document.write('<script src="' + source + '" defer></' + 'script>');
@@ -88,7 +88,7 @@ export class ScriptLoader {
 			return;
 		}
 
-		let script = document.createElement('script');
+		let script = document.createElement("script");
 		script.text = tag.text;
 		this.embeddedScripts.push(script);
 	}

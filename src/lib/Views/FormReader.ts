@@ -12,26 +12,27 @@ export class FormReader {
 		}
 	}
 
-	public pull(): any {
+	public read(): any {
 		var motherObject = {};
 		for (let i = 0; i < this.container.childElementCount; i++) {
-			var item = <HTMLElement>this.container.children[i];
-			var name = this.getName(item);
+			var element = <HTMLElement>this.container.children[i];
+			var name = this.getName(element);
 
 			//no name, maybe got nested data
 			if (!name) {
-				var data = this.pullElement(item);
+				var data = this.pullElement(element);
 				if (data) {
-					return data;
+                    this.appendObject(motherObject, data);
 				}
 				continue;
 			}
 
 			var childValue;
-			if (this.isCollection(item)) {
-				childValue = this.pullCollection(item);
+			if (this.isCollection(element)) {
+				childValue = this.pullCollection(element);
 			} else {
-				childValue = this.pullElement(item);
+				childValue = this.pullElement(element);
+                childValue = this.adjustCheckboxes(element, motherObject, childValue);
 			}
 			this.assignByName(name, motherObject, childValue);
 		}
@@ -101,17 +102,7 @@ export class FormReader {
 		return arr;
 	}
 
-	private processValue(value: string): any {
-		if (!isNaN(<any>value)) {
-			return parseInt(value, 10);
-		} else if (value == 'true') {
-			return true;
-		} else if (value == 'false') {
-			return false;
-		} 
 
-		return value;
-	}
 	private pullElement(container: HTMLElement): any {
 		if (container.childElementCount === 0) {
 			if (container.tagName == 'SELECT') {
@@ -139,10 +130,10 @@ export class FormReader {
 
 		var data = {};
 		for (let i = 0; i < container.childElementCount; i++) {
-			var item = <HTMLElement>container.children[i];
-			var name = this.getName(item);
+			var element = <HTMLElement>container.children[i];
+			var name = this.getName(element);
 			if (!name) {
-				var value = this.pullElement(item);
+				var value = this.pullElement(element);
 				if (!this.isObjectEmpty(value)) {
 					this.appendObject(data, value);
 				}
@@ -150,10 +141,11 @@ export class FormReader {
 			}
 			var value;
 
-			if (this.isCollection(item)) {
-				value = this.pullCollection(item);
+			if (this.isCollection(element)) {
+				value = this.pullCollection(element);
 			} else {
-				value = this.pullElement(item);
+				value = this.pullElement(element);
+                value = this.adjustCheckboxes(element, data, value);
 				if (value === null) {
 					continue;
 				}
@@ -164,6 +156,39 @@ export class FormReader {
 		return this.isObjectEmpty(data) ? null : data;
 	}
 
+    private adjustCheckboxes(element: HTMLElement, dto: any, value: any): any {
+        //checkboxes should be arrays
+        if (value !== null && element.tagName === "INPUT" && element.getAttribute("type") === "checkbox") {
+            //todo: fetch value using dot notation.
+            var name = this.getName(element);
+            var currentValue = dto[name];
+            if (typeof currentValue !== "undefined") {
+                if (currentValue instanceof Array) {
+                    currentValue["push"](value);
+                    value = currentValue;
+                }
+                else {
+                    value = [currentValue, value];
+                }
+            }
+            else {
+                value = [value];
+            }
+        }
+
+        return value;
+    }
+	private processValue(value: string): any {
+		if (!isNaN(<any>value)) {
+			return parseInt(value, 10);
+		} else if (value == 'true') {
+			return true;
+		} else if (value == 'false') {
+			return false;
+		} 
+
+		return value;
+	}
 	private assignByName(name: string, parentObject: any, value: any) {
 		var parts = name.split('.');
 		var obj = parentObject;

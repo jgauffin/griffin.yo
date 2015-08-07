@@ -5,11 +5,10 @@ export class ClassFactory
 		const nameParts = viewModelModuleAndName.split(".");
 		let fn = (window[appName] || this[appName]);
 		if (typeof fn === "undefined") {
-			throw new Error(`Failed to load application namespace "${appName}'. Have a view model been loaded successfully?`);
+			throw new Error(`Failed to load application namespace "${appName}". Have a view model been loaded successfully?`);
 		}
 		for (var i = 0, len = nameParts.length; i < len; i++) {
 			if (fn.hasOwnProperty(nameParts[i])) {
-				console.log('....identified', nameParts[i]);
 				fn = fn[nameParts[i]];
 				continue;
 			}

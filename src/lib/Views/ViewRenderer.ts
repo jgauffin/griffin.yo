@@ -19,7 +19,7 @@ export class ViewRenderer {
 	 */
 	constructor(elemOrName: HTMLElement|string) {
 		if (typeof elemOrName === "string") {
-			this.container = <HTMLElement>document.querySelector('#' + elemOrName + ",[data-name=\"" + elemOrName + "\"]");
+			this.container = <HTMLElement>document.querySelector("#" + elemOrName + ",[data-name=\"" + elemOrName + "\"]");
 			if (!this.container) {
 				throw new Error("Failed to locate '" + elemOrName + "'.");
 			}
@@ -38,7 +38,11 @@ export class ViewRenderer {
 
 	public render(data: any = {}, directives: any = {}) {
 		this.dtoStack.push(data);
-		this.renderElement(this.container, data, directives);
+        if (data instanceof Array){
+            this.renderCollection(this.container, data, directives);
+        } else {
+            this.renderElement(this.container, data, directives);
+        }
 	}
 
 	private renderElement(element: HTMLElement, data: any, directives = {}) {
@@ -123,9 +127,30 @@ export class ViewRenderer {
 
 	private renderCollection(element: HTMLElement, data: any, directive = null) {
 		var container = element;
+        
+        if (element.hasAttribute("data-unless")) {
+            var value = element.getAttribute("data-unless");
+            var name = this.getName(element);
+            var result = false;
+            if (name === value) {
+                result = data.length === 0;
+            } else {
+                var ctx = { element: element, data: data, dto: this.dtoStack[this.dtoStack.length-2] };
+                result = this.evalInContext(value, ctx);
+            }
+            if (result) {
+                element.style.display = "";
+            } else {
+                element.style.display = "none";
+            }            
+        }
+        
 		if (container.tagName === "TR"
 			|| container.tagName === "LI") {
 			container = container.parentElement;
+            container.setAttribute("data-collection", element.getAttribute("data-collection"));
+            element.setAttribute("data-name", "value");
+            element.removeAttribute("data-collection");
 		}
 
 		var template = <HTMLElement>container.firstElementChild.cloneNode(true);
@@ -133,7 +158,7 @@ export class ViewRenderer {
 		template.style.display = "";
 		if (!container.firstElementChild.hasAttribute("data-template")) {
 			if (container.childElementCount !== 1) {
-				throw new Error("There must be a single child element in collection containers. If you use multiple elements you need to for instance wrap them in a div. Path: '" + this.lineage.join(' -> ') + "'.");
+				throw new Error("There must be a single child element in collection containers. If you use multiple elements you need to for instance wrap them in a div. Path: '" + this.lineage.join(" -> ") + "'.");
 			}
 			var el = <HTMLElement>container.firstElementChild;
 			el.style.display = "none";
@@ -161,8 +186,8 @@ export class ViewRenderer {
 	private applyEmbeddedDirectives(element: HTMLElement, data: any, directives: any): boolean {
 		var isDirectiveValueSpecified = false;
 		for (var key in directives) {
-			var value = directives[key](data, this.dtoStack[this.dtoStack.length - 2]);
-			if (key === "html" || key === "value" || key === "text") {
+			var value = directives[key].apply(element, [data, this.dtoStack[this.dtoStack.length - 2]]);
+			if (key === "html") {
 				isDirectiveValueSpecified = true;
 				element.innerHTML = value;
 			} else if (key === "text") {
@@ -197,16 +222,24 @@ export class ViewRenderer {
 		return context.value;
 	}
 	private getName(el: HTMLElement): string {
-		return el.getAttribute("name") || el.getAttribute("data-name") || el.getAttribute("data-collection");
+		return el.getAttribute("name") || el.getAttribute("data-name") || el.getAttribute("data-collection") || el.getAttribute("data-unless");
 	}
 
 	private hasName(el: HTMLElement): boolean {
-		return el.hasAttribute("name") || el.hasAttribute("data-name") || el.hasAttribute("data-collection");
+		return el.hasAttribute("name") || el.hasAttribute("data-name") || el.hasAttribute("data-collection") || el.hasAttribute("data-unless");
 	}
 
 	private isCollection(el: HTMLElement): boolean {
 		return el.hasAttribute("data-collection");
 	}
+    
+    private evalInContext(code: string, context: any) {
+		var func = function (js) {
+			return eval("with (this) { " + js + "}");
+		};
+		return func.call(context, code);
+	}
+    
 }
 
 export class ViewValueDirectiveContext {

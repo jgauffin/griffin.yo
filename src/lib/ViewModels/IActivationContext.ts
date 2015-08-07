@@ -24,12 +24,18 @@ export interface IActivationContext {
 
 	/**
 	 * Render partial view
-	 * @param partialSelector Id/Selector for the part to update
+	 * @param viewSelector Id/Selector for the part to update
 	 * @param data data to populate the part with
 	 * @param directives directives that adopts the data to fit the view.
 	 */
-	renderPartial(partialSelector: string, data: any, directives?: any);
+	renderPartial(viewSelector: string, data: any, directives?: any);
 
+    /**
+     * Read a form from your view
+     * @param viewSelector Either a "data-name"/"id" or a HTMLElement that contains the form to read
+     * @return A JSON object
+     */
+    readForm(viewSelector: string|HTMLElement);
 
 	/**
 	 * Used to identify elements in the view

@@ -1,4 +1,4 @@
-/// <reference path="../../../../../source/Griffin.Yo.ts"/> 
+/// <reference path="../../Griffin.Yo.ts"/> 
 var DemoApp;
 (function (DemoApp) {
     var Users;
@@ -12,7 +12,7 @@ var DemoApp;
             };
             DetailsViewModel.prototype.activate = function (context) {
                 Yo.Http.get('/user/' + context.routeData['id'], function (xhr) {
-                    context.render(xhr.responseBody);
+                    context.render(xhr['responseJson']);
                     context.resolve();
                 });
             };

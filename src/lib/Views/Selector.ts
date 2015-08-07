@@ -12,7 +12,7 @@ export class Selector {
 	}
 
 	one(idOrselector: string): HTMLElement {
-		if (idOrselector.substr(0, 1) === '#') {
+		if (idOrselector.substr(0, 1) === "#") {
 			let el2 = this.scope.querySelector(idOrselector);
 			if (!el2) {
 				throw new Error(`Failed to find element '${idOrselector}'.`);
@@ -34,7 +34,7 @@ export class Selector {
 	all(selector: string): HTMLElement[] {
 		const result: HTMLElement[] = [];
 
-		const items = selector.match('[\s\.,\[]+').length === 0
+		const items = selector.match("[\s\.,\[]+").length === 0
 			? this.scope.querySelectorAll(`[data-name="${selector}"],[name="${selector}"],#${selector}`)
 			: this.scope.querySelectorAll(selector);
 		for (let i = 0; i < items.length; i++) {

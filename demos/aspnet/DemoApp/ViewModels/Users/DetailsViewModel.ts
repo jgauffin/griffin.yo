@@ -1,4 +1,4 @@
-﻿/// <reference path="../../../../../source/Griffin.Yo.ts"/> 
+﻿/// <reference path="../../Griffin.Yo.ts"/> 
 
 module DemoApp.Users {
     import Yo = Griffin.Yo;
@@ -10,7 +10,7 @@ module DemoApp.Users {
 
         public activate(context: Yo.IActivationContext): void {
             Yo.Http.get('/user/' + context.routeData['id'], xhr => {
-                context.render(xhr.responseBody);
+                context.render(xhr['responseJson']);
                 context.resolve();
             });
         }

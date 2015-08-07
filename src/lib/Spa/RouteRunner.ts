@@ -29,8 +29,8 @@ export class RouteRunner implements IRouteHandler {
 		for (let i = 0; i < links.length; i++) {
 			const link = <HTMLAnchorElement>links[i];
 
-			let pos = link.href.indexOf('#');
-			if (pos === -1 || link.href.substr(pos + 1, 1) !== '/') {
+			let pos = link.href.indexOf("#");
+			if (pos === -1 || link.href.substr(pos + 1, 1) !== "/") {
 				continue;
 			}
 			for (let dataName in routeData) {
@@ -54,7 +54,7 @@ export class RouteRunner implements IRouteHandler {
 				throw new Error(`Failed to find target element '${target}' for navigation '${nav.innerHTML}'`);
 
 
-			var ifStatement = nav.getAttribute('data-if');
+			var ifStatement = nav.getAttribute("data-if");
 			var ifResult = !ifStatement || !this.evalInContext(ifStatement, context);
 			if (!ifResult) {
 				nav.parentNode.removeChild(nav);
@@ -70,7 +70,7 @@ export class RouteRunner implements IRouteHandler {
 	private removeConditions(elem: HTMLElement, context: any) {
 		for (var i = 0; i < elem.childElementCount; i++) {
 			var child = elem.children[i];
-			var ifStatement = child.getAttribute('data-if');
+			var ifStatement = child.getAttribute("data-if");
 			var ifResult = !ifStatement || !this.evalInContext(ifStatement, context);
 			if (!ifResult) {
 				child.parentNode.removeChild(child);
@@ -82,11 +82,16 @@ export class RouteRunner implements IRouteHandler {
 
 	private evalInContext(code: string, context: any) {
 		var func = function (js) {
-			return eval('with (this) { ' + js + '}');
+			return eval("with (this) { " + js + "}");
 		};
 		return func.call(context, code);
 	}
 
+    private isIE() {
+        var myNav = navigator.userAgent.toLowerCase();
+        return (myNav.indexOf('msie') != -1) ? parseInt(myNav.split('msie')[1]) : false;
+    }
+    
 	invoke(ctx: IRouteExecutionContext): void {
 		this.ensureResources(() => {
 			var viewElem = document.createElement("div");
@@ -97,17 +102,21 @@ export class RouteRunner implements IRouteHandler {
 			//add script
 			var scriptElem = document.createElement("script");
 			scriptElem.setAttribute("type", "text/javascript");
-			scriptElem.setAttribute('data-tag', 'viewModel');
+			scriptElem.setAttribute("data-tag", "viewModel");
 			ctx.target.attachViewModel(scriptElem);
-			scriptElem.innerHTML = this.viewModelScript;
+			if (this.isIE() <= 9) {
+                scriptElem.text = this.viewModelScript;
+            } else {
+                scriptElem.innerHTML = this.viewModelScript;
+            }
 
 			//load model and run it
 			var className = (this.section.replace(/\//g, ".") + "ViewModel");
 			this.viewModel = GlobalConfig.viewModelFactory.create(this.applicationName, className);
 			var vm = this.viewModel;
 		  
-			if (vm.hasOwnProperty('getTargetOptions')) {
-				var options = vm['hasTargetOptions']();
+			if (vm.hasOwnProperty("getTargetOptions")) {
+				var options = vm["hasTargetOptions"]();
 				ctx.target.assignOptions(options);
 			} else {
 				ctx.target.assignOptions({});
@@ -124,6 +133,10 @@ export class RouteRunner implements IRouteHandler {
 					const r = new ViewRenderer(viewElem);
 					r.render(data, directives);
 				},
+                readForm(selector:HTMLElement|string): any{
+                    var reader = new FormReader(selector);
+                    return reader.read();
+                },
 				renderPartial(selector: string, data: any, directives?: any) {
 					//const selectorStr = `[${this.bindAttributeName}="${propertyName}"],[name="${propertyName}"],#${propertyName}`;
 					const part = <HTMLElement>viewElem.querySelector(selector);
@@ -138,13 +151,13 @@ export class RouteRunner implements IRouteHandler {
 
 					ctx.target.setTitle(vm.getTitle());
 					ctx.target.render(viewElem);
-					var scripts = viewElem.getElementsByTagName('script');
+					var scripts = viewElem.getElementsByTagName("script");
 					var loader = new ScriptLoader();
 					for (var i = 0; i < scripts.length; i++) {
 						loader.loadTags(scripts[i]);
 					}
 
-					var allIfs = viewElem.querySelectorAll('[data-if]');
+					var allIfs = viewElem.querySelectorAll("[data-if]");
 					for (var j = 0; j < allIfs.length; j++) {
 						var elem = allIfs[j];
 						var value = elem.nodeValue;

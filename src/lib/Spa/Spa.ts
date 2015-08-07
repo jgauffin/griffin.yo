@@ -18,7 +18,7 @@ export class Spa {
 			 */
 	constructor(public applicationName: string) {
 		this.basePath = window.location.pathname;
-		this.defaultViewTarget = new ElementViewTarget('#YoView');
+		this.defaultViewTarget = new ElementViewTarget("#YoView");
 	}
 
 	addTarget(name: string, target: IViewTarget) {
@@ -77,7 +77,7 @@ export class Spa {
 
 			// allow regular hash links on pages
 			// by required hashbangs (#/!) or just hash'slash'em (#/)
-			if (window.location.hash.substr(1, 1) !== '/')
+			if (window.location.hash.substr(1, 1) !== "/")
 				return;
 
 			// remove shebang

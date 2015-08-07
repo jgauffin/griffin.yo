@@ -7,15 +7,17 @@
         <div id="MyView">
             <h2 data-name="Title"></h2>
             <ul>
-                <li data-collection="Items"></li>
+                <li data-collection="Items">
+                    <span data-name="Name"></span>
+                </li>
             </ul>
         </div>
         <script src="../../../src/Griffin.Yo.js"></script>
         <script type="text/javascript">
             var Yo = Griffin.Yo;
             
-            //arrays as part of an object works just fine.
-            Yo.G.render('MyView', { Title: 'Hello world', Items: ['Adam', 'Bertil', 'Ceasar'] });
+            var directives = { Items: { Name: { style(value) { return 'font-size: 20pt;'; } } } };
+            Yo.G.render('MyView', { Title: 'Hello world', Items: [{ Name: 'Adam' }, {Name: 'Bertil'}, {Name: 'Ceasar' }] }, directives);
             
         </script>
     </body>

@@ -19,11 +19,11 @@ export class Http {
 	 */
 	static get(url: string, callback: (name: XMLHttpRequest, success: boolean) => void, contentType: string = "application/json"): void {
 		var request = new XMLHttpRequest();
+		request.open("GET", url, true);
 		if (typeof this.cache[url] !== "undefined") {
 			const cache = this.cache[url];
 			request.setRequestHeader("If-Modified-Since", cache.modifiedAt);
-		};
-		request.open("GET", url, true);
+		}
 		request.setRequestHeader("Content-Type", contentType);
 		request.onload = () => {
 			if (request.status >= 200 && request.status < 400) {
@@ -41,6 +41,7 @@ export class Http {
 
 				if (contentType === "application/json") {
 					request.responseBody = JSON.parse(request.responseText);
+                    request["responseJson"] = JSON.parse(request.responseText);
 				}
 				callback(request, true);
 			} else {

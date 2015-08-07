@@ -13,7 +13,7 @@ export class ElementViewTarget implements IViewTarget {
 		if (typeof elementOrId === "string") {
 			this.container = document.getElementById(elementOrId.substr(1));
 			if (!this.container) {
-				throw `Could not locate "${elementOrId}'`;
+				throw `Could not locate "${elementOrId}"`;
 			}
 		} else {
 			this.container = elementOrId;

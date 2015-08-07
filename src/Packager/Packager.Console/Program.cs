@@ -67,6 +67,10 @@ namespace Packager.Console
                 sb.AppendLine("}");
 
             File.WriteAllText(outputFile, sb.ToString(), Encoding.UTF8);
+
+            var psi = new ProcessStartInfo("tsc.exe", "-d \"" + outputFile + "\" --out \"" + outputFile.Replace(".ts", ".js") + "\"");
+            psi.UseShellExecute = true;
+            Process.Start(psi);
         }
 
         private static void ScanDirectory(string directory, StringBuilder sb)
