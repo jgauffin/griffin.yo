@@ -74,17 +74,23 @@ export class Spa {
 		}
 
 		window.addEventListener("hashchange", () => {
+            var hash = window.location.hash;
 
-			// allow regular hash links on pages
-			// by required hashbangs (#/!) or just hash'slash'em (#/)
-			if (window.location.hash.substr(1, 1) !== "/")
-				return;
+            // back button to root page.
+            if (!hash) {
+                hash = '#/';
+            }
 
-			// remove shebang
-			var changedUrl = window.location.hash.substr(2);
-			if (changedUrl.substr(0, 1) === "!") {
-				changedUrl = changedUrl.substr(1);
-			}
+            // allow regular hash links on pages
+            // by required hashbangs (#/!) or just hash'slash'em (#/)
+            if (hash.substr(1, 1) !== "/")
+                return;
+
+            // remove shebang
+            var changedUrl = hash.substr(2);
+            if (changedUrl.substr(0, 1) === "!") {
+                changedUrl = changedUrl.substr(1);
+            }
 			this.router.execute(changedUrl);
 		});
 

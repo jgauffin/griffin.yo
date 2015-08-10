@@ -652,17 +652,23 @@ export class Spa {
 		}
 
 		window.addEventListener("hashchange", () => {
+            var hash = window.location.hash;
 
-			// allow regular hash links on pages
-			// by required hashbangs (#/!) or just hash'slash'em (#/)
-			if (window.location.hash.substr(1, 1) !== "/")
-				return;
+            // back button to root page.
+            if (!hash) {
+                hash = '#/';
+            }
 
-			// remove shebang
-			var changedUrl = window.location.hash.substr(2);
-			if (changedUrl.substr(0, 1) === "!") {
-				changedUrl = changedUrl.substr(1);
-			}
+            // allow regular hash links on pages
+            // by required hashbangs (#/!) or just hash'slash'em (#/)
+            if (hash.substr(1, 1) !== "/")
+                return;
+
+            // remove shebang
+            var changedUrl = hash.substr(2);
+            if (changedUrl.substr(0, 1) === "!") {
+                changedUrl = changedUrl.substr(1);
+            }
 			this.router.execute(changedUrl);
 		});
 
@@ -1237,35 +1243,7 @@ export class FormReader {
 		return arr;
 	}
 
-    private adjustCheckboxes(element: HTMLElement, dto: any, value: any): any {
-        //checkboxes should be arrays
-        if (element.tagName === "INPUT" && element.getAttribute("type") === "checkbox") {
-            //todo: fetch value using dot notation.
-            var currentValue = dto[name];
-            if (typeof currentValue !== "undefined") {
-                if (currentValue instanceof Array) {
-                    value["push"](value);
-                } else {
-                    value = [currentValue, value];
-                }
-            } else {
-                value = [value];
-            }
-        }
 
-        return value;
-    }
-	private processValue(value: string): any {
-		if (!isNaN(<any>value)) {
-			return parseInt(value, 10);
-		} else if (value == 'true') {
-			return true;
-		} else if (value == 'false') {
-			return false;
-		} 
-
-		return value;
-	}
 	private pullElement(container: HTMLElement): any {
 		if (container.childElementCount === 0) {
 			if (container.tagName == 'SELECT') {
@@ -1319,6 +1297,39 @@ export class FormReader {
 		return this.isObjectEmpty(data) ? null : data;
 	}
 
+    private adjustCheckboxes(element: HTMLElement, dto: any, value: any): any {
+        //checkboxes should be arrays
+        if (value !== null && element.tagName === "INPUT" && element.getAttribute("type") === "checkbox") {
+            //todo: fetch value using dot notation.
+            var name = this.getName(element);
+            var currentValue = dto[name];
+            if (typeof currentValue !== "undefined") {
+                if (currentValue instanceof Array) {
+                    currentValue["push"](value);
+                    value = currentValue;
+                }
+                else {
+                    value = [currentValue, value];
+                }
+            }
+            else {
+                value = [value];
+            }
+        }
+
+        return value;
+    }
+	private processValue(value: string): any {
+		if (!isNaN(<any>value)) {
+			return parseInt(value, 10);
+		} else if (value == 'true') {
+			return true;
+		} else if (value == 'false') {
+			return false;
+		} 
+
+		return value;
+	}
 	private assignByName(name: string, parentObject: any, value: any) {
 		var parts = name.split('.');
 		var obj = parentObject;

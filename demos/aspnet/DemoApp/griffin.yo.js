@@ -554,12 +554,17 @@ var Griffin;
                     url = url.substr(1);
                 }
                 window.addEventListener("hashchange", function () {
+                    var hash = window.location.hash;
+                    // back button to root page.
+                    if (!hash) {
+                        hash = '#/';
+                    }
                     // allow regular hash links on pages
                     // by required hashbangs (#/!) or just hash'slash'em (#/)
-                    if (window.location.hash.substr(1, 1) !== "/")
+                    if (hash.substr(1, 1) !== "/")
                         return;
                     // remove shebang
-                    var changedUrl = window.location.hash.substr(2);
+                    var changedUrl = hash.substr(2);
                     if (changedUrl.substr(0, 1) === "!") {
                         changedUrl = changedUrl.substr(1);
                     }
@@ -996,37 +1001,6 @@ var Griffin;
                 }
                 return arr;
             };
-            FormReader.prototype.adjustCheckboxes = function (element, dto, value) {
-                //checkboxes should be arrays
-                if (element.tagName === "INPUT" && element.getAttribute("type") === "checkbox") {
-                    //todo: fetch value using dot notation.
-                    var currentValue = dto[name];
-                    if (typeof currentValue !== "undefined") {
-                        if (currentValue instanceof Array) {
-                            value["push"](value);
-                        }
-                        else {
-                            value = [currentValue, value];
-                        }
-                    }
-                    else {
-                        value = [value];
-                    }
-                }
-                return value;
-            };
-            FormReader.prototype.processValue = function (value) {
-                if (!isNaN(value)) {
-                    return parseInt(value, 10);
-                }
-                else if (value == 'true') {
-                    return true;
-                }
-                else if (value == 'false') {
-                    return false;
-                }
-                return value;
-            };
             FormReader.prototype.pullElement = function (container) {
                 if (container.childElementCount === 0) {
                     if (container.tagName == 'SELECT') {
@@ -1078,6 +1052,39 @@ var Griffin;
                     this.assignByName(name, data, value);
                 }
                 return this.isObjectEmpty(data) ? null : data;
+            };
+            FormReader.prototype.adjustCheckboxes = function (element, dto, value) {
+                //checkboxes should be arrays
+                if (value !== null && element.tagName === "INPUT" && element.getAttribute("type") === "checkbox") {
+                    //todo: fetch value using dot notation.
+                    var name = this.getName(element);
+                    var currentValue = dto[name];
+                    if (typeof currentValue !== "undefined") {
+                        if (currentValue instanceof Array) {
+                            currentValue["push"](value);
+                            value = currentValue;
+                        }
+                        else {
+                            value = [currentValue, value];
+                        }
+                    }
+                    else {
+                        value = [value];
+                    }
+                }
+                return value;
+            };
+            FormReader.prototype.processValue = function (value) {
+                if (!isNaN(value)) {
+                    return parseInt(value, 10);
+                }
+                else if (value == 'true') {
+                    return true;
+                }
+                else if (value == 'false') {
+                    return false;
+                }
+                return value;
             };
             FormReader.prototype.assignByName = function (name, parentObject, value) {
                 var parts = name.split('.');
