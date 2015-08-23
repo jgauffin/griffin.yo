@@ -21,7 +21,7 @@ export class Selector {
 		}
 
 		if (idOrselector.match(/[\s\.\,\[]+/g) === null) {
-			var result = this.scope.querySelector(`[data-name='${idOrselector}'],[name="${idOrselector}"],#${idOrselector}`);
+			var result = this.scope.querySelector(`[data-name='${idOrselector}'],[data-collection='${idOrselector}'],[name="${idOrselector}"],#${idOrselector}`);
 			if (result)
 				return result;
 		}
@@ -35,7 +35,7 @@ export class Selector {
 		const result: HTMLElement[] = [];
 
 		const items = selector.match("[\s\.,\[]+").length === 0
-			? this.scope.querySelectorAll(`[data-name="${selector}"],[name="${selector}"],#${selector}`)
+			? this.scope.querySelectorAll(`[data-name="${selector}"],[data-collection='${selector}'],[name="${selector}"],#${selector}`)
 			: this.scope.querySelectorAll(selector);
 		for (let i = 0; i < items.length; i++) {
 			result.push(<HTMLElement>items[i]);

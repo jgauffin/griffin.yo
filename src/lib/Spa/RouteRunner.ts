@@ -138,12 +138,9 @@ export class RouteRunner implements IRouteHandler {
                     return reader.read();
                 },
 				renderPartial(selector: string, data: any, directives?: any) {
-					//const selectorStr = `[${this.bindAttributeName}="${propertyName}"],[name="${propertyName}"],#${propertyName}`;
-					const part = <HTMLElement>viewElem.querySelector(selector);
-					if (!part) {
-						throw new Error(`Failed to find partial '${selector}'.`);
-					}
-					const r = new ViewRenderer(part);
+					const selector1 = new Selector(viewElem);
+					const target = selector1.one(selector);
+					const r = new ViewRenderer(target);
 					r.render(data, directives);
 				},
 				resolve() {
@@ -151,17 +148,17 @@ export class RouteRunner implements IRouteHandler {
 
 					ctx.target.setTitle(vm.getTitle());
 					ctx.target.render(viewElem);
-					var scripts = viewElem.getElementsByTagName("script");
-					var loader = new ScriptLoader();
+					const scripts = viewElem.getElementsByTagName("script");
+					const loader = new ScriptLoader();
 					for (var i = 0; i < scripts.length; i++) {
 						loader.loadTags(scripts[i]);
 					}
 
-					var allIfs = viewElem.querySelectorAll("[data-if]");
-					for (var j = 0; j < allIfs.length; j++) {
-						var elem = allIfs[j];
-						var value = elem.nodeValue;
-						var result = this.evalInContext(value, { model: this.viewModel, ctx: ctx });
+					const allIfs = viewElem.querySelectorAll("[data-if]");
+					for (let j = 0; j < allIfs.length; j++) {
+						let elem = allIfs[j];
+						let value = elem.nodeValue;
+						let result = this.evalInContext(value, { model: this.viewModel, ctx: ctx });
 						if (!result) {
 							elem.parentNode.removeChild(elem);
 						}

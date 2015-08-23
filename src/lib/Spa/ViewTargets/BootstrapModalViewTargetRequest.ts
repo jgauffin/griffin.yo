@@ -1,34 +1,38 @@
+/** Load view in a Boostrap modal
+ */
 export class BootstrapModalViewTargetRequest {
 	private node: HTMLElement;
+	private name: string;
 	private modal: any;
 
-	constructor() {
-			this.node = document.createElement('div');
-			this.node.setAttribute('id', 'BootstrapModal');
-			this.node.setAttribute('class', 'modal fade view-target');
-			this.node.setAttribute('role', 'dialog');
-			document.body.appendChild(this.node);
+	constructor(name : string) {
+		this.name = name;
+		this.node = document.createElement('div');
+		this.node.setAttribute('id', this.name);
+		this.node.setAttribute('class', 'modal fade view-target');
+		this.node.setAttribute('role', 'dialog');
+		document.body.appendChild(this.node);
 
 
-			var contents = '\r\n' +
-				'  <div class="modal-dialog">\r\n' +
-				'\r\n' +
-				'    <div class="modal-content">\r\n' +
-				'      <div class="modal-header">\r\n' +
-				'        <button type="button" class="close" data-dismiss="modal">&times;</button>\r\n' +
-				'        <h4 class="modal-title"></h4>\r\n' +
-				'      </div>\r\n' +
-				'      <div class="modal-body">\r\n' +
-				'        \r\n' +
-				'      </div>\r\n' +
-				'      <div class="modal-footer">\r\n' +
-				'        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\r\n' +
-				'      </div>\r\n' +
-				'    </div>\r\n' +
-				'\r\n' +
-				'  </div>\r\n' +
-				'';
-			this.node.innerHTML = contents;
+		var contents = '\r\n' +
+			'  <div class="modal-dialog">\r\n' +
+			'\r\n' +
+			'    <div class="modal-content">\r\n' +
+			'      <div class="modal-header">\r\n' +
+			'        <button type="button" class="close" data-dismiss="modal">&times;</button>\r\n' +
+			'        <h4 class="modal-title"></h4>\r\n' +
+			'      </div>\r\n' +
+			'      <div class="modal-body">\r\n' +
+			'        \r\n' +
+			'      </div>\r\n' +
+			'      <div class="modal-footer">\r\n' +
+			'        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\r\n' +
+			'      </div>\r\n' +
+			'    </div>\r\n' +
+			'\r\n' +
+			'  </div>\r\n' +
+			'';
+		this.node.innerHTML = contents;
 
 	}
 
@@ -87,7 +91,7 @@ export class BootstrapModalViewTargetRequest {
 			this.node.parentElement.removeChild(this.node);
 		});
 
-		var buttons = element.querySelectorAll('button');
+		var buttons = element.querySelectorAll('button,input[type="submit"],input[type="button"]');
 		if (buttons.length > 0) {
 			while (footer.firstChild) {
 				footer.removeChild(footer.firstChild);
@@ -96,6 +100,9 @@ export class BootstrapModalViewTargetRequest {
 				(<HTMLElement>buttons[i]).className += ' btn';
 				(<HTMLElement>buttons[i]).addEventListener('click', e => {
 					this.modal.modal('hide');
+					if ((buttons[i].tagName == "input" && buttons[i].type !== "submit") || buttons[i].hasAttribute("data-dismiss")){
+						window.history.go(-1);
+					}
 				});
 				footer.appendChild(buttons[i]);
 			}

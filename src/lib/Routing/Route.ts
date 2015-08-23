@@ -5,7 +5,9 @@ export class Route implements IRoute {
 	private parts: string[] = [];
 
 	constructor(public route: string, public handler: IRouteHandler, public target?: IViewTarget) {
-		this.parts = route.replace(/^\//, "").split("/");
+		this.parts = route.replace(/^\//, "")
+		                  .replace(/\/$/, "")
+		                  .split("/");
 	}
 
 	isMatch(ctx: IRouteContext): boolean {

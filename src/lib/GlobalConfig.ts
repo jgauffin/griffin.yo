@@ -24,7 +24,7 @@ GlobalConfig.resourceLocator = {
 			const pos = window.location.pathname.lastIndexOf("/");
 			path = window.location.pathname.substr(0, pos);
 		}
-		if (path.substring(-1, 1) === '/') {
+		if (path.substring(-1, 1) === "/") {
 			path = path.substring(0, -1);
 		}
 		return path + `/Views/${section}.html`;
@@ -35,7 +35,7 @@ GlobalConfig.resourceLocator = {
 			const pos = window.location.pathname.lastIndexOf("/");
 			path = window.location.pathname.substr(0, pos);
 		}
-		if (path.substring(-1, 1) === '/') {
+		if (path.substring(-1, 1) === "/") {
 			path = path.substring(0, -1);
 		}
 		return path + `/ViewModels/${section}ViewModel.js`;

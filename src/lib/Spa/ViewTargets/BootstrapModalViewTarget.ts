@@ -48,7 +48,7 @@ export class BootstrapModalViewTarget implements IViewTarget {
 	}
 
 	attachViewModel(script: HTMLScriptElement) {
-		this.currentNode = new BootstrapModalViewTargetRequest();
+		this.currentNode = new BootstrapModalViewTargetRequest(this.name);
 		this.currentNode.attachViewModel(script);
 	}
 

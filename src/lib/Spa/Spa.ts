@@ -13,15 +13,16 @@ export class Spa {
 	private defaultViewTarget: IViewTarget;
 
 	/**
-			 * Create Spa.
-			 * @param applicationName Only used for namespacing of VMs
-			 */
+	 * Create Spa.
+	 * @param applicationName Only used for namespacing of VMs
+	 */
 	constructor(public applicationName: string) {
 		this.basePath = window.location.pathname;
 		this.defaultViewTarget = new ElementViewTarget("#YoView");
 	}
 
 	addTarget(name: string, target: IViewTarget) {
+		target.name = name;
 		this.viewTargets.push(target);
 	}
 

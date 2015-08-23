@@ -19,7 +19,11 @@ export class ViewRenderer {
 	 */
 	constructor(elemOrName: HTMLElement|string) {
 		if (typeof elemOrName === "string") {
-			this.container = <HTMLElement>document.querySelector("#" + elemOrName + ",[data-name=\"" + elemOrName + "\"]");
+			if (elemOrName.substr(0,1) === "#") {
+				this.container = document.getElementById(elemOrName.substr(1));
+			} else {
+				this.container = <HTMLElement>document.querySelector(`[data-name='${elemOrName}'],[data-collection='${elemOrName}'],#${elemOrName},[name="${elemOrName}"]`);
+			}
 			if (!this.container) {
 				throw new Error("Failed to locate '" + elemOrName + "'.");
 			}
