@@ -1,22 +1,43 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <title>Demo</title>
-    </head>
-    <body>
+
+<head>
+    <title>Examples - Collections</title>
+    <link rel="stylesheet" href="../css/site.css" />
+
+</head>
+
+<body>
+    <h1>Collections</h1>
+    <p>Collections can be rendered to any type of objects. It do not have to be a table or a list, it can be a plain div.</p>
+    <h2>View</h2>
+    <pre><code>&lt;div id="MyView">
+    &lt;h2 data-name="Title">&lt;/h2>
+    &lt;ul>
+        &lt;li data-collection="Items">&lt;/li>
+    &lt;/ul>
+&lt;/div>
+</code></pre>
+    <h2>Code</h2>
+    <pre><code>
+var dto = { Title: 'Hello world', Items: ['Adam', 'Bertil', 'Ceasar'] };
+Yo.G.render('MyView', dto);
+</code></pre>
+    <h2>Result</h2>
+    <div class="result">
         <div id="MyView">
             <h2 data-name="Title"></h2>
             <ul>
                 <li data-collection="Items"></li>
             </ul>
         </div>
-        <script src="../../../src/Griffin.Yo.js"></script>
-        <script type="text/javascript">
-            var Yo = Griffin.Yo;
-            
-            //arrays as part of an object works just fine.
-            Yo.G.render('MyView', { Title: 'Hello world', Items: ['Adam', 'Bertil', 'Ceasar'] });
-            
-        </script>
-    </body>
+    </div>
+    <script src="../lib/Griffin.Yo.js"></script>
+    <script type="text/javascript">
+        var Yo = Griffin.Yo;
+            var dto = { Title: 'Hello world', Items: ['Adam', 'Bertil', 'Ceasar'] };
+            Yo.G.render('MyView', dto);
+    </script>
+</body>
+
 </html>

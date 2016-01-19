@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Examples - Table with complex objects</title>
+    <link rel="stylesheet" href="../css/site.css" />
+</head>
+
+<body>
+    <div id="menu"></div>
+    <div id="content-wrapper">
+        <h1>Rendering a table using complex objects</h1>
+        <p>Griffin.Yo supports collections that consists of objects with deep object graphs.</p>
+        <h2>View</h2>
+        <pre><code>&lt;div id="MyView">
+    &lt;h2 id="Title">&lt;/h2>
+    &lt;table>
+        &lt;tr data-collection="Items">
+            &lt;td data-name="Name">&lt;/td>
+            &lt;td data-name="Address">
+                &lt;span data-name="Postal">&lt;/span>
+                &lt;span data-name="City">&lt;/span>
+            &lt;/td>
+        &lt;/tr>
+    &lt;/table>
+&lt;/div></code></pre>
+        <h2>Code</h2>
+        <pre><code>var data = { 
+    Title: 'Hello world', 
+    Items: [
+        { Name: 'Jonas', Address: { Postal: 12345, City: "Falun" }}, 
+        { Name: 'Tom', Address: { Postal: 54321, City: "Stockholm" }}
+    ] 
+};
+Griffin.Yo.G.render('MyView', data);</code></pre>
+        <h2>Result</h2>
+        <div class="result">
+            <p>
+                <div id="MyView">
+                    <h2 id="Title"></h2>
+                    <table>
+                        <tr data-collection="Items">
+                            <td data-name="Name"></td>
+                            <td data-name="Address">
+                                <span data-name="Postal"></span>
+                                <span data-name="City"></span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <script src="../lib/jquery-2.1.4.min.js"></script>
+    <script src="../lib/Griffin.Yo.js"></script>
+    <script>
+        $("#menu").load("../menu.html");
+    </script>
+    <script type="text/javascript">
+        var Yo = Griffin.Yo;
+            
+            var data = { 
+                Title: 'Hello world', 
+                Items: [
+                    { Name: 'Jonas', Address: { Postal: 12345, City: "Falun" }}, 
+                    { Name: 'Tom', Address: { Postal: 54321, City: "Stockholm" }}
+                ] 
+            };
+            //complex objects in arrays are no problem
+            Yo.G.render('MyView', data);
+    </script>
+</body>
+
+</html>

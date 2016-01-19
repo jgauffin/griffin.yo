@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Demo</title>
+    </head>
+    <body>
+        <div id="MyView">
+            <h2 data-name="FirstName"></h2>
+            <div data-name="Address">
+                <span data-name="PostalCode"></span>
+                <span data-name="City"></span>
+            </div>
+        </div>
+        <script src="../../../src/Griffin.Yo.js"></script>
+        <script type="text/javascript">
+            var Yo = Griffin.Yo;
+            
+            var data = { FirstName: "Jonas",
+                         Address: {
+                            City: "Falun",
+                            PostalCode: "791 00"
+                        }
+                       };
+            
+            // do not have to specify directives
+            // for everything.
+            var directives = {
+                FirstName: { 
+                    //second argument is the object at the current level.
+                    text(value, dto) { return value + " [" + dto.Address.PostalCode + "]"; }
+                },
+                Address: {
+                    City: {
+                        //DTO = Address
+                        html(value, dto) { return '&lt;' + value + '&gt;'; }
+                    }
+                }
+            };
+                        
+            Yo.G.render('MyView', data, directives);
+            
+        </script>
+    </body>
+</html>

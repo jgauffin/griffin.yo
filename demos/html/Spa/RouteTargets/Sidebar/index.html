@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Demo</title>
+    </head>
+    <body>
+        <div style="float:right" id="sideBar">
+        </div>
+        <div id="YoView">
+        </div>
+        <a href="#/">Home</a>
+        <a href="#/users">Users (in sidebar)</a>
+        
+        <script src="../../lib/Griffin.Yo.js"></script>
+        <script type="text/javascript">
+            var Yo = Griffin.Yo;
+            
+            var spa = new Yo.Spa.SpaEngine("BasicApp");
+            spa.addTarget("sideBar", "#sideBar")
+            
+            spa.mapRoute("/", "Home/Index");
+            spa.mapRoute("/users", "Users/Index", "sideBar");
+            spa.run();
+        </script>
+        
+    </body>
+    
+</html>

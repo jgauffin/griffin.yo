@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Demo</title>
+    </head>
+    <body>
+        <div id="YoView">
+        </div>
+        <a href="#/">Home</a>
+        <a href="#/users">Users</a>
+        
+        <script src="../../../../src/Griffin.Yo.js"></script>
+        <script type="text/javascript">
+            var Yo = Griffin.Yo;
+            
+            var spa = new Yo.Spa("BasicApp");
+            spa.mapRoute("/", "Home/Index");
+            spa.mapRoute("/users", "Users/Index");
+            spa.run();
+        </script>
+    </body>
+</html>

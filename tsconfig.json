@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "declaration": true,
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "outFile": "./bin/Griffin.Yo.js",
+        "sourceMap": true,
+        "target": "es5",
+        "moduleResolution": "classic"
+    },
+    "files": [
+        "src2/Dom.ts",
+        "src2/Net.ts",
+        "src2/Routing.ts",
+        "src2/Routing.ViewTargets.ts",
+        "src2/Spa.ts",
+        "src2/Spa.ViewModels.ts",
+        "src2/Views.ts",
+        "src2/G.ts",
+        "src2/GlobalConfig.ts"
+    ]
+}

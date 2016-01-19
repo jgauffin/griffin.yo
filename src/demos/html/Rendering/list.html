@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Demo</title>
+    </head>
+    <body>
+        <div id="MyView">
+            <h2 data-name="Title"></h2>
+            <ul>
+                <li data-collection="Items"></li>
+            </ul>
+        </div>
+        <script src="../../../src/Griffin.Yo.js"></script>
+        <script type="text/javascript">
+            var Yo = Griffin.Yo;
+            
+            //arrays as part of an object works just fine.
+            Yo.G.render('MyView', { Title: 'Hello world', Items: ['Adam', 'Bertil', 'Ceasar'] });
+            
+        </script>
+    </body>
+</html>

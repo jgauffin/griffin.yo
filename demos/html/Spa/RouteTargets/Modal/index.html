@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Demo</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+</head>
+
+<body>
+    <div id="YoView">
+    </div>
+    <a href="#/">Home</a>
+    <a href="#/users">Users (in modal dialog)</a>
+
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="../../lib/Griffin.Yo.js"></script>
+    <script type="text/javascript">
+        var Yo = Griffin.Yo;
+            
+            var spa = new Yo.Spa.SpaEngine("BasicApp");
+            
+            var target = new Griffin.Yo.Routing.ViewTargets.BootstrapModalViewTarget();
+            spa.addTarget("modal", target);
+            
+            spa.mapRoute("/", "Home/Index");
+            spa.mapRoute("/users", "Users/Index", "modal");
+            spa.run();
+    </script>
+</body>
+
+</html>

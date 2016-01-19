@@ -1,0 +1,11 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Launch",
+			"type": "chrome",
+			"request": "launch",
+			"file": "${fileBasename}"
+		}
+	]
+}

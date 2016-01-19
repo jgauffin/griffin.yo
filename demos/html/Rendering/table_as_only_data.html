@@ -1,9 +1,35 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <title>Demo</title>
-    </head>
-    <body>
+
+<head>
+    <title>Examples - collection as root data</title>
+    <link rel="stylesheet" href="../css/site.css" />
+</head>
+
+<body>
+    <h1>Collection as only data</h1>
+    <p>Some libraries have trouble if the data returned from the server is a collection. Griffin.Yo handles that.</p>
+    <h2>View</h2>
+    <pre><code>&lt;div id="MyView">
+    &lt;table>
+        &lt;tr id="DataTarget">
+            &lt;td data-name="Name">&lt;/td>
+            &lt;td data-name="Address">
+                &lt;span data-name="Postal">&lt;/span>
+                &lt;span data-name="City">&lt;/span>
+            &lt;/td>
+        &lt;/tr>
+    &lt;/table>
+&lt;/div></code></pre>
+    <h2>Code</h2>
+    <pre><code>
+Yo.G.render('DataTarget', [
+    { Name: 'Jonas', Address: { Postal: 12345, City: "Falun" }}, 
+    { Name: 'Tom', Address: { Postal: 54321, City: "Stockholm" }}
+]);
+</code></pre>
+    <h2>Result</h2>
+    <div class="result">
         <div id="MyView">
             <table>
                 <tr id="DataTarget">
@@ -15,14 +41,18 @@
                 </tr>
             </table>
         </div>
-        <script src="../../../src/Griffin.Yo.js"></script>
-        <script type="text/javascript">
-            var Yo = Griffin.Yo;
+    </div>
+    <script src="../lib/Griffin.Yo.js"></script>
+    <script type="text/javascript">
+        var Yo = Griffin.Yo;
             
             //Need to point on the container as the renderer can't really tell
             //what you want to get repeated.
-            Yo.G.render('DataTarget', [{ Name: 'Jonas', Address: { Postal: 12345, City: "Falun" }}, { Name: 'Tom', Address: { Postal: 54321, City: "Stockholm" }}]);
-            
-        </script>
-    </body>
+            Yo.G.render('DataTarget', [
+                { Name: 'Jonas', Address: { Postal: 12345, City: "Falun" }}, 
+                { Name: 'Tom', Address: { Postal: 54321, City: "Stockholm" }}
+            ]);
+    </script>
+</body>
+
 </html>

@@ -1,29 +1,56 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <title>Demo</title>
-    </head>
-    <body>
-        <div id="MyView">
+
+<head>
+    <title>Demo</title>
+    <link rel="stylesheet" href="../css/site.css" />
+</head>
+
+<body>
+    <h1>Complex object</h1>
+    <p>Complex objects are object graphs that span over more than one level. Griffin.Yo can render complex structures without
+        you having to do anything special. Just create the same structure in your view.
+        <h2>View</h2>
+        <pre><code>&lt;div id="MyView">
+    &lt;h2 data-name="FirstName">&lt;/h2>
+    &lt;div data-name="Address">
+        &lt;span data-name="PostalCode">&lt;/span>
+        &lt;span data-name="City">&lt;/span>
+    &lt;/div>
+&lt;/div>
+    </code></pre>
+        <h2>Code</h2>
+        <pre><code>var data = { 
+    FirstName: "Jonas",
+    Address: {
+        City: "Falun",
+        PostalCode: "791 00"
+    }
+};            
+context.render(data);
+  </code></pre>
+        <h2>Result</h2>
+        <div class="result" <div id="MyView">
             <h2 data-name="FirstName"></h2>
             <div data-name="Address">
                 <span data-name="PostalCode"></span>
                 <span data-name="City"></span>
             </div>
         </div>
-        <script src="../../../src/Griffin.Yo.js"></script>
+        </div>
+        <script src="../lib/Griffin.Yo.js"></script>
         <script type="text/javascript">
             var Yo = Griffin.Yo;
-            
-            var data = { FirstName: "Jonas",
-                         Address: {
-                            City: "Falun",
-                            PostalCode: "791 00"
-                        }
-                       };
+            var data = { 
+                FirstName: "Jonas",
+                Address: {
+                    City: "Falun",
+                    PostalCode: "791 00"
+                }
+            };
             
             Yo.G.render('MyView', data);
-            
         </script>
-    </body>
+</body>
+
 </html>

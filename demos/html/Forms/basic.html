@@ -62,11 +62,11 @@
                 <input name="[]" value="Griffin.Framework" /></div>
         </div>
         <button id="submit">Submit</button> 
-        <script src="../../../src/Griffin.Yo.js"></script> 
+        <script src="../../../bin/Griffin.Yo.js"></script> 
         <script type="text/javascript">
             var Yo = Griffin.Yo;
             document.getElementById("submit").addEventListener("click", function(e) {
-                var form = new Yo.FormReader("MyView");
+                var form = new Yo.Dom.FormReader("MyView");
                 var dto = form.read();
                 var node = document.createElement("div");
                 node.innerText = "Pulled data: " + JSON.stringify(dto);

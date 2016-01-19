@@ -1,0 +1,23 @@
+pre {
+	border: 1px solid #999;
+	background: #eee;
+	padding: 10px;
+}
+
+.result {
+	background: #eaeaea;
+	padding: 10px;
+}
+#menu{
+	width: 400px;
+	float: left;
+	height: 100%;
+}
+.clearfix{
+	clear:both;
+	margin-top: 10px;
+}
+#content-wrapper{
+	float:left;
+}
+html, body { height: 100%; }

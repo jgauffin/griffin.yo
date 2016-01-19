@@ -1,17 +1,63 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <title>Demo</title>
-    </head>
-    <body>
-        <div id="MyView">
-            <h2 data-name="Name"></h2>
+
+<head>
+    <title>Using directives when rendering</title>
+    <link rel="stylesheet" href="../css/site.css" />
+</head>
+
+<body>
+    <div id="menu"></div>
+    <div id="content-wrapper">
+
+        <h1>Using directives</h1>
+        <p>Directives enable you do two control how the JSON data is rendered. It can be to generate composite properties or
+            as in this example dynamically style the contents.
+        </p>
+        <h2>View</h2>
+        <pre><code>&lt;div id="MyView">
+    &lt;h2 data-name="Name"></h2>
+&lt;/div>
+
+&lt;button id="withHtml">Render with HTML instead&lt;/button>
+    </code></pre>
+        <h2>Code</h2>
+        <pre><code>var directives = {  
+                   Name: {
+                        text(value) { return value + ' <span>(HTML as text)</span>'; },
+                        style(value) { return 'color: red'; },
+                        class(value) { return 'someClass'; }
+                    }
+                };
+                
+Griffin.Yo.G.render('MyView', { Name: 'Arne' }, directives);
+
+//or in the view model:  
+context.render({ Name: 'Arne' }, directives);
+
+document.getElementById('withHtml').addEventListener('click', function(e) {
+    e.preventDefault();
+    Griffin.Yo.G.render('MyView', { Name: 'Arne' }, { Name: { html(value) { return value + ' <span>(HTML as text)</span>'; } } });
+});
+</code></pre>
+        <h2>Result</h2>
+        <div class="result">
+            <div id="MyView">
+                <h2 data-name="Name"></h2>
+            </div>
+
+            <button id="withHtml">Render with HTML instead</button>
         </div>
-        
-        <button id="withHtml">Render with HTML instead</button>
-        <script src="../../../src/Griffin.Yo.js"></script>
-        <script type="text/javascript">
-            var Yo = Griffin.Yo;
+
+    </div>
+    <div class="clearfix"></div>
+    <script src="../lib/jquery-2.1.4.min.js"></script>
+    <script src="../lib/Griffin.Yo.js"></script>
+    <script>
+        $("#menu").load("../menu.html");
+    </script>
+    <script type="text/javascript">
+        var Yo = Griffin.Yo;
             
             var directives = {  Name: {
                                     text(value) { return value + ' <span>(HTML as text)</span>'; },
@@ -27,6 +73,7 @@
                 e.preventDefault();
                 Yo.G.render('MyView', { Name: 'Arne' }, { Name: { html(value) { return value + ' <span>(HTML as text)</span>'; } } });
             });
-        </script>
-    </body>
+    </script>
+</body>
+
 </html>

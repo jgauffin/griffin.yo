@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Demo</title>
+    </head>
+    <body>
+        <div id="MyView">
+            <table>
+                <tr id="DataTarget">
+                    <td data-name="Name"></td>
+                    <td data-name="Address">
+                        <span data-name="Postal"></span>
+                        <span data-name="City"></span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <script src="../../../src/Griffin.Yo.js"></script>
+        <script type="text/javascript">
+            var Yo = Griffin.Yo;
+            
+            //Need to point on the container as the renderer can't really tell
+            //what you want to get repeated.
+            Yo.G.render('DataTarget', [{ Name: 'Jonas', Address: { Postal: 12345, City: "Falun" }}, { Name: 'Tom', Address: { Postal: 54321, City: "Stockholm" }}]);
+            
+        </script>
+    </body>
+</html>
