@@ -73,7 +73,7 @@ var Griffin;
                 Http.invokeRequest('POST', url, data, callback, options);
             };
             /**
-             * PUT a resource to the server
+             * POST a resource to the server
              * @param url Server resource to post to
              * @param callback Invoked once the response is received from the server (or when something fails).
              * @param options Additional configuration
@@ -85,19 +85,17 @@ var Griffin;
                 Http.invokeRequest('PUT', url, data, callback, options);
             };
             /**
-             * DELETE a resource on the server
-             * @param url Server resource to post to
-             * @param callback Invoked once the response is received from the server (or when something fails).
-             * @param options Additional configuration
-             */
+         * POST a resource to the server
+         * @param url Server resource to post to
+         * @param callback Invoked once the response is received from the server (or when something fails).
+         * @param options Additional configuration
+         */
             Http.delete = function (url, callback, options) {
                 Http.invokeRequest('DELETE', url, null, callback, options);
             };
             /**
-             * Make an HTTP request
-             * @param verb HTTP verb
-             * @param url Server resource to make a request to
-             * @param data null if no body should be sent
+             * POST a resource to the server
+             * @param url Server resource to post to
              * @param callback Invoked once the response is received from the server (or when something fails).
              * @param options Additional configuration
              */
@@ -171,9 +169,7 @@ var Griffin;
                 this.handler = handler;
                 this.target = target;
                 this.parts = [];
-                this.parts = route.replace(/^\//, "")
-                    .replace(/\/$/, "")
-                    .split("/");
+                this.parts = route.replace(/^\//, "").split("/");
             }
             Route.prototype.isMatch = function (ctx) {
                 var urlParts = ctx.url.split("/", 10);
@@ -404,9 +400,12 @@ var Griffin;
                             return reader.read();
                         },
                         renderPartial: function (selector, data, directives) {
-                            var selector1 = new Selector(viewElem);
-                            var target = selector1.one(selector);
-                            var r = new ViewRenderer(target);
+                            //const selectorStr = `[${this.bindAttributeName}="${propertyName}"],[name="${propertyName}"],#${propertyName}`;
+                            var part = viewElem.querySelector(selector);
+                            if (!part) {
+                                throw new Error("Failed to find partial '" + selector + "'.");
+                            }
+                            var r = new ViewRenderer(part);
                             r.render(data, directives);
                         },
                         resolve: function () {
@@ -585,9 +584,9 @@ var Griffin;
          */
         var Spa = (function () {
             /**
-             * Create Spa.
-             * @param applicationName Only used for namespacing of VMs
-             */
+                     * Create Spa.
+                     * @param applicationName Only used for namespacing of VMs
+                     */
             function Spa(applicationName) {
                 this.applicationName = applicationName;
                 this.router = new Router();
@@ -595,6 +594,7 @@ var Griffin;
                 this.basePath = "";
                 this.applicationScope = {};
                 this.viewTargets = [];
+                this.history = [];
                 this.basePath = window.location.pathname;
                 this.defaultViewTarget = new ElementViewTarget("#YoView");
             }
@@ -608,6 +608,7 @@ var Griffin;
              * @param targetElement If the result should be rendered somewhere else than the main layout div.
              */
             Spa.prototype.navigate = function (url, targetElement) {
+                this.history.push(url);
                 this.router.execute.apply(this.applicationScope, [url, targetElement]);
             };
             /**
@@ -661,8 +662,10 @@ var Griffin;
                     if (changedUrl.substr(0, 1) === "!") {
                         changedUrl = changedUrl.substr(1);
                     }
+                    _this.history.push(changedUrl);
                     _this.router.execute(changedUrl);
                 });
+                this.history.push(url);
                 this.router.execute(url);
             };
             Spa.prototype.mapFunctionToRouteData = function (f, routeData) {
@@ -713,7 +716,7 @@ var Griffin;
                 //}
             };
             BootstrapModalViewTarget.prototype.attachViewModel = function (script) {
-                this.currentNode = new BootstrapModalViewTargetRequest(this.name);
+                this.currentNode = new BootstrapModalViewTargetRequest();
                 this.currentNode.attachViewModel(script);
             };
             BootstrapModalViewTarget.prototype.setTitle = function (title) {
@@ -731,13 +734,10 @@ var Griffin;
             return BootstrapModalViewTarget;
         })();
         Yo.BootstrapModalViewTarget = BootstrapModalViewTarget;
-        /** Load view in a Boostrap modal
-         */
         var BootstrapModalViewTargetRequest = (function () {
-            function BootstrapModalViewTargetRequest(name) {
-                this.name = name;
+            function BootstrapModalViewTargetRequest() {
                 this.node = document.createElement('div');
-                this.node.setAttribute('id', this.name);
+                this.node.setAttribute('id', 'BootstrapModal');
                 this.node.setAttribute('class', 'modal fade view-target');
                 this.node.setAttribute('role', 'dialog');
                 document.body.appendChild(this.node);
@@ -805,22 +805,26 @@ var Griffin;
                 var _this = this;
                 this.node.querySelector('.modal-body').appendChild(element);
                 var footer = this.node.querySelector('.modal-footer');
+                var startHash = window.location.hash;
                 this.modal = $(this.node).modal();
                 $(this.modal).on('hidden.bs.modal', function () {
                     _this.modal.modal('hide').data('bs.modal', null);
                     _this.node.parentElement.removeChild(_this.node);
+                    if (startHash === window.location.hash) {
+                        window.history.go(-1);
+                    }
                 });
                 var buttons = element.querySelectorAll('button,input[type="submit"],input[type="button"]');
                 if (buttons.length > 0) {
                     while (footer.firstChild) {
                         footer.removeChild(footer.firstChild);
                     }
+                    var self = this;
                     for (var i = 0; i < buttons.length; i++) {
                         var button = buttons[i];
                         button.className += ' btn';
-                        button.addEventListener('click', function (e, button) {
-                            console.log(this);
-                            this.modal.modal('hide');
+                        button.addEventListener('click', function (button, e) {
+                            self.modal.modal('hide');
                             if ((button.tagName === "input" && button.getAttribute("type") !== "submit") || button.hasAttribute("data-dismiss")) {
                                 window.history.go(-1);
                             }
@@ -1247,7 +1251,7 @@ var Griffin;
                     return el2;
                 }
                 if (idOrselector.match(/[\s\.\,\[]+/g) === null) {
-                    var result = this.scope.querySelector("[data-name='" + idOrselector + "'],[data-collection='" + idOrselector + "'],[name=\"" + idOrselector + "\"],#" + idOrselector);
+                    var result = this.scope.querySelector("[data-name='" + idOrselector + "'],[name=\"" + idOrselector + "\"],#" + idOrselector);
                     if (result)
                         return result;
                 }
@@ -1259,7 +1263,7 @@ var Griffin;
             Selector.prototype.all = function (selector) {
                 var result = [];
                 var items = selector.match("[\s\.,\[]+").length === 0
-                    ? this.scope.querySelectorAll("[data-name=\"" + selector + "\"],[data-collection='" + selector + "'],[name=\"" + selector + "\"],#" + selector)
+                    ? this.scope.querySelectorAll("[data-name=\"" + selector + "\"],[name=\"" + selector + "\"],#" + selector)
                     : this.scope.querySelectorAll(selector);
                 for (var i = 0; i < items.length; i++) {
                     result.push(items[i]);
@@ -1287,12 +1291,7 @@ var Griffin;
                 this.dtoStack = [];
                 this.directives = [];
                 if (typeof elemOrName === "string") {
-                    if (elemOrName.substr(0, 1) === "#") {
-                        this.container = document.getElementById(elemOrName.substr(1));
-                    }
-                    else {
-                        this.container = document.querySelector("[data-name='" + elemOrName + "'],[data-collection='" + elemOrName + "'],#" + elemOrName + ",[name=\"" + elemOrName + "\"]");
-                    }
+                    this.container = document.querySelector("#" + elemOrName + ",[data-name=\"" + elemOrName + "\"]");
                     if (!this.container) {
                         throw new Error("Failed to locate '" + elemOrName + "'.");
                     }
@@ -1556,7 +1555,7 @@ var Griffin;
                     var pos = window.location.pathname.lastIndexOf("/");
                     path = window.location.pathname.substr(0, pos);
                 }
-                if (path.substring(-1, 1) === "/") {
+                if (path.substring(-1, 1) === '/') {
                     path = path.substring(0, -1);
                 }
                 return path + ("/Views/" + section + ".html");
@@ -1567,7 +1566,7 @@ var Griffin;
                     var pos = window.location.pathname.lastIndexOf("/");
                     path = window.location.pathname.substr(0, pos);
                 }
-                if (path.substring(-1, 1) === "/") {
+                if (path.substring(-1, 1) === '/') {
                     path = path.substring(0, -1);
                 }
                 return path + ("/ViewModels/" + section + "ViewModel.js");

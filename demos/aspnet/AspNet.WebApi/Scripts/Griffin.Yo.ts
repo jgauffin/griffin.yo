@@ -10,185 +10,183 @@
 module Griffin.Yo {
 
 
-/**
- * Our wrapper around AJAX focused on loading resources and data from the server.
- */
-export class Http {
-	private static cache = {};
+    /**
+     * Our wrapper around AJAX focused on loading resources and data from the server.
+     */
+    export class Http {
+        private static cache = {};
 
-	/**
-	 * Whether HTTP caching ('If-Modified-Since' and 'Last-Modified') can be used.
-	 */
-	static useCaching = true;
+        /**
+         * Whether HTTP caching ('If-Modified-Since' and 'Last-Modified') can be used.
+         */
+        static useCaching = true;
 
-	/**
-	 * Get a resource from the server.
-	 * @param url Server to fetch from
-	 * @param callback Invoked once the response is received from the server (or when something fails).
-	 * @param contentType Content type for the request.
-	 */
-	static get(url: string, callback: (name: XMLHttpRequest, success: boolean) => void, contentType: string = "application/json"): void {
-		var request = new XMLHttpRequest();
-		request.open("GET", url, true);
-		if (typeof this.cache[url] !== "undefined") {
-			const cache = this.cache[url];
-			request.setRequestHeader("If-Modified-Since", cache.modifiedAt);
-		}
-		request.setRequestHeader("Content-Type", contentType);
-		request.onload = () => {
-			if (request.status >= 200 && request.status < 400) {
-				if (request.status === 304) {
-					request.responseText = this.cache[url].content;
-				} else {
-					const header = request.getResponseHeader("Last-Modified");
-					if (header) {
-						this.cache[url] = {
-							content: request.responseText,
-							modifiedAt: header
-						};
-					}
-				}
+        /**
+         * Get a resource from the server.
+         * @param url Server to fetch from
+         * @param callback Invoked once the response is received from the server (or when something fails).
+         * @param contentType Content type for the request.
+         */
+        static get(url: string, callback: (name: XMLHttpRequest, success: boolean) => void, contentType: string = "application/json"): void {
+            var request = new XMLHttpRequest();
+            request.open("GET", url, true);
+            if (typeof this.cache[url] !== "undefined") {
+                const cache = this.cache[url];
+                request.setRequestHeader("If-Modified-Since", cache.modifiedAt);
+            }
+            request.setRequestHeader("Content-Type", contentType);
+            request.onload = () => {
+                if (request.status >= 200 && request.status < 400) {
+                    if (request.status === 304) {
+                        request.responseText = this.cache[url].content;
+                    } else {
+                        const header = request.getResponseHeader("Last-Modified");
+                        if (header) {
+                            this.cache[url] = {
+                                content: request.responseText,
+                                modifiedAt: header
+                            };
+                        }
+                    }
 
-				if (contentType === "application/json") {
-					request.responseBody = JSON.parse(request.responseText);
-					request["responseJson"] = JSON.parse(request.responseText);
-				}
-				callback(request, true);
-			} else {
-				callback(request, false);
-			}
-		};
+                    if (contentType === "application/json") {
+                        request.responseBody = JSON.parse(request.responseText);
+                        request["responseJson"] = JSON.parse(request.responseText);
+                    }
+                    callback(request, true);
+                } else {
+                    callback(request, false);
+                }
+            };
 
-		request.onerror = () => {
-			callback(request, false);
-		};
-		request.send();
-	}
+            request.onerror = () => {
+                callback(request, false);
+            };
+            request.send();
+        }
 
 
-	/**
+        /**
+         * POST a resource to the server
+         * @param url Server resource to post to
+         * @param callback Invoked once the response is received from the server (or when something fails).
+         * @param options Additional configuration
+         */
+        static post(url: string, data: any, callback: (name: XMLHttpRequest, success: boolean) => void, options?: IHttpOptions): void {
+            if (!data) {
+                throw new Error("You must specify a body when using POST.");
+            }
+            Http.invokeRequest('POST', url, data, callback, options);
+        }
+
+        /**
+         * POST a resource to the server
+         * @param url Server resource to post to
+         * @param callback Invoked once the response is received from the server (or when something fails).
+         * @param options Additional configuration
+         */
+        static put(url: string, data: any, callback: (name: XMLHttpRequest, success: boolean) => void, options?: IHttpOptions): void {
+            if (!data) {
+                throw new Error("You must specify a body when using PUT.");
+            }
+            Http.invokeRequest('PUT', url, data, callback, options);
+        }
+
+
+        /**
 	 * POST a resource to the server
 	 * @param url Server resource to post to
 	 * @param callback Invoked once the response is received from the server (or when something fails).
 	 * @param options Additional configuration
 	 */
-	static post(url: string, data: any, callback: (name: XMLHttpRequest, success: boolean) => void, options?: IHttpOptions): void {
-		if (!data) {
-			throw new Error("You must specify a body when using POST.");
-		}
-		Http.invokeRequest('POST', url, data, callback, options);
-	}
-
-	/**
-	 * PUT a resource to the server
-	 * @param url Server resource to post to
-	 * @param callback Invoked once the response is received from the server (or when something fails).
-	 * @param options Additional configuration
-	 */
-	static put(url: string, data: any, callback: (name: XMLHttpRequest, success: boolean) => void, options?: IHttpOptions): void {
-		if (!data) {
-			throw new Error("You must specify a body when using PUT.");
-		}
-		Http.invokeRequest('PUT', url, data, callback, options);
-	}
+        static delete(url: string, callback: (name: XMLHttpRequest, success: boolean) => void, options?: IHttpOptions): void {
+            Http.invokeRequest('DELETE', url, null, callback, options);
+        }
 
 
-	/**
-	 * DELETE a resource on the server
-	 * @param url Server resource to post to
-	 * @param callback Invoked once the response is received from the server (or when something fails).
-	 * @param options Additional configuration
-	 */
-	static delete(url: string, callback: (name: XMLHttpRequest, success: boolean) => void, options?: IHttpOptions): void {
-		Http.invokeRequest('DELETE', url, null, callback, options);
-	}
+        /**
+         * POST a resource to the server
+         * @param url Server resource to post to
+         * @param callback Invoked once the response is received from the server (or when something fails).
+         * @param options Additional configuration
+         */
+        static invokeRequest(verb: string, url: string, data: any, callback: (name: XMLHttpRequest, success: boolean) => void, options?: IHttpOptions): void {
+            if (!verb) {
+                throw new Error("You must specify a HTTP verb");
+            }
+
+            if (options && options.userName && !options.password) {
+                throw new Error("You must provide password when username has been specified.");
+            }
+
+            var request = new XMLHttpRequest();
+            if (options && options.userName) {
+                request.open(verb, url, true, options.userName, options.password);
+            } else {
+                request.open(verb, url, true);
+            }
+            
+
+            var requestContentType = "application/json";
+            if (options && options.contentType) {
+                requestContentType = options.contentType;
+            }
+
+            if (options && options.headers) {
+                for (let key in options.headers) {
+                    request.setRequestHeader(key, options.headers[key]);
+                }
+            }
 
 
-	/**
-	 * Make an HTTP request
-	 * @param verb HTTP verb
-	 * @param url Server resource to make a request to
-	 * @param data null if no body should be sent
-	 * @param callback Invoked once the response is received from the server (or when something fails).
-	 * @param options Additional configuration
-	 */
-	static invokeRequest(verb: string, url: string, data: any, callback: (name: XMLHttpRequest, success: boolean) => void, options?: IHttpOptions): void {
-		if (!verb) {
-			throw new Error("You must specify a HTTP verb");
-		}
+            request.onload = () => {
+                if (request.status >= 200 && request.status < 400) {
+                    var contentType = request.getResponseHeader("content-type").toLocaleLowerCase();
+                    if (contentType === "application/json") {
+                        //this doesn't work in IE
+                        request.responseBody = JSON.parse(request.responseText);
 
-		if (options && options.userName && !options.password) {
-			throw new Error("You must provide password when username has been specified.");
-		}
+                        //for IE
+                        request["responseJson"] = JSON.parse(request.responseText);
+                    }
+                    callback(request, true);
+                } else {
+                    callback(request, false);
+                }
+            };
 
-		var request = new XMLHttpRequest();
-		if (options && options.userName) {
-			request.open(verb, url, true, options.userName, options.password);
-		} else {
-			request.open(verb, url, true);
-		}
-		
+            request.onerror = () => {
+                callback(request, false);
+            };
 
-		var requestContentType = "application/json";
-		if (options && options.contentType) {
-			requestContentType = options.contentType;
-		}
+            if (typeof data !== "undefined" && data !== null) {
+                request.setRequestHeader("Content-Type", requestContentType);
+                if (requestContentType === "application/json" && typeof (data) !== "string") {
+                    data = JSON.stringify(data);
+                }
+                request.send(data);
+            } else {
+                request.send();
+            }
 
-		if (options && options.headers) {
-			for (let key in options.headers) {
-				request.setRequestHeader(key, options.headers[key]);
-			}
-		}
+        }
+    }
 
-
-		request.onload = () => {
-			if (request.status >= 200 && request.status < 400) {
-				var contentType = request.getResponseHeader("content-type").toLocaleLowerCase();
-				if (contentType === "application/json") {
-					//this doesn't work in IE
-					request.responseBody = JSON.parse(request.responseText);
-
-					//for IE
-					request["responseJson"] = JSON.parse(request.responseText);
-				}
-				callback(request, true);
-			} else {
-				callback(request, false);
-			}
-		};
-
-		request.onerror = () => {
-			callback(request, false);
-		};
-
-		if (typeof data !== "undefined" && data !== null) {
-			request.setRequestHeader("Content-Type", requestContentType);
-			if (requestContentType === "application/json" && typeof (data) !== "string") {
-				data = JSON.stringify(data);
-			}
-			request.send(data);
-		} else {
-			request.send();
-		}
-
-	}
-}
-
-/** Options for requests */
-export interface IHttpOptions {
-
-	/** Can contain headers (key: value) */
-	headers?: any;
-	
-	/** Content type if something other than application/json */
-	contentType?: string;
-	
-	/** User name if authentication should be used */
-	userName?: string;
-	
-	/** Required when userName is specified */
-	password?: string;
-}
+    /** Options for requests */
+    export interface IHttpOptions {
+    
+        /** Can contain headers (key: value) */
+        headers?: any;
+        
+        /** Content type if something other than application/json */
+        contentType?: string;
+        
+        /** User name if authentication should be used */
+        userName?: string;
+        
+        /** Required when userName is specified */
+        password?: string;
+    }
 
 
 
@@ -242,9 +240,7 @@ export class Route implements IRoute {
 	private parts: string[] = [];
 
 	constructor(public route: string, public handler: IRouteHandler, public target?: IViewTarget) {
-		this.parts = route.replace(/^\//, "")
-		                  .replace(/\/$/, "")
-		                  .split("/");
+		this.parts = route.replace(/^\//, "").split("/");
 	}
 
 	isMatch(ctx: IRouteContext): boolean {
@@ -506,9 +502,12 @@ export class RouteRunner implements IRouteHandler {
                     return reader.read();
                 },
 				renderPartial(selector: string, data: any, directives?: any) {
-					const selector1 = new Selector(viewElem);
-					const target = selector1.one(selector);
-					const r = new ViewRenderer(target);
+					//const selectorStr = `[${this.bindAttributeName}="${propertyName}"],[name="${propertyName}"],#${propertyName}`;
+					const part = <HTMLElement>viewElem.querySelector(selector);
+					if (!part) {
+						throw new Error(`Failed to find partial '${selector}'.`);
+					}
+					const r = new ViewRenderer(part);
 					r.render(data, directives);
 				},
 				resolve() {
@@ -516,17 +515,17 @@ export class RouteRunner implements IRouteHandler {
 
 					ctx.target.setTitle(vm.getTitle());
 					ctx.target.render(viewElem);
-					const scripts = viewElem.getElementsByTagName("script");
-					const loader = new ScriptLoader();
+					var scripts = viewElem.getElementsByTagName("script");
+					var loader = new ScriptLoader();
 					for (var i = 0; i < scripts.length; i++) {
 						loader.loadTags(scripts[i]);
 					}
 
-					const allIfs = viewElem.querySelectorAll("[data-if]");
-					for (let j = 0; j < allIfs.length; j++) {
-						let elem = allIfs[j];
-						let value = elem.nodeValue;
-						let result = this.evalInContext(value, { model: this.viewModel, ctx: ctx });
+					var allIfs = viewElem.querySelectorAll("[data-if]");
+					for (var j = 0; j < allIfs.length; j++) {
+						var elem = allIfs[j];
+						var value = elem.nodeValue;
+						var result = this.evalInContext(value, { model: this.viewModel, ctx: ctx });
 						if (!result) {
 							elem.parentNode.removeChild(elem);
 						}
@@ -711,19 +710,20 @@ export class Spa {
 	private basePath = "";
 	private applicationScope = {};
 	private viewTargets : IViewTarget[] = [];
-	private defaultViewTarget: IViewTarget;
+    private defaultViewTarget: IViewTarget;
+    private history: string[] = [];
 
 	/**
-	 * Create Spa.
-	 * @param applicationName Only used for namespacing of VMs
-	 */
+			 * Create Spa.
+			 * @param applicationName Only used for namespacing of VMs
+			 */
 	constructor(public applicationName: string) {
 		this.basePath = window.location.pathname;
 		this.defaultViewTarget = new ElementViewTarget("#YoView");
 	}
 
-	addTarget(name: string, target: IViewTarget) {
-		target.name = name;
+    addTarget(name: string, target: IViewTarget) {
+        target.name = name;
 		this.viewTargets.push(target);
 	}
 
@@ -732,7 +732,8 @@ export class Spa {
 	 * @param URL Everything after the hash in the complete URI, like 'user/1'
 	 * @param targetElement If the result should be rendered somewhere else than the main layout div.
 	 */
-	navigate(url: string, targetElement?: any) {
+    navigate(url: string, targetElement?: any) {
+        this.history.push(url);
 		this.router.execute.apply(this.applicationScope, [url, targetElement]);
 	}
 
@@ -793,9 +794,12 @@ export class Spa {
             if (changedUrl.substr(0, 1) === "!") {
                 changedUrl = changedUrl.substr(1);
             }
+
+            this.history.push(changedUrl);
 			this.router.execute(changedUrl);
 		});
 
+        this.history.push(url);
 		this.router.execute(url);
 	}
 
@@ -856,7 +860,7 @@ export class BootstrapModalViewTarget implements IViewTarget {
 	}
 
 	attachViewModel(script: HTMLScriptElement) {
-		this.currentNode = new BootstrapModalViewTargetRequest(this.name);
+		this.currentNode = new BootstrapModalViewTargetRequest();
 		this.currentNode.attachViewModel(script);
 	}
 
@@ -874,41 +878,36 @@ export class BootstrapModalViewTarget implements IViewTarget {
 		this.currentNode = null;
 	}
 }
-/** Load view in a Boostrap modal
- */
 export class BootstrapModalViewTargetRequest {
 	private node: HTMLElement;
-	private name: string;
 	private modal: any;
 
-	constructor(name : string) {
-		this.name = name;
-		this.node = document.createElement('div');
-		this.node.setAttribute('id', this.name);
-		this.node.setAttribute('class', 'modal fade view-target');
-		this.node.setAttribute('role', 'dialog');
-		document.body.appendChild(this.node);
+	constructor() {
+			this.node = document.createElement('div');
+			this.node.setAttribute('id', 'BootstrapModal');
+			this.node.setAttribute('class', 'modal fade view-target');
+			this.node.setAttribute('role', 'dialog');
+			document.body.appendChild(this.node);
 
-
-		var contents = '\r\n' +
-			'  <div class="modal-dialog">\r\n' +
-			'\r\n' +
-			'    <div class="modal-content">\r\n' +
-			'      <div class="modal-header">\r\n' +
-			'        <button type="button" class="close" data-dismiss="modal">&times;</button>\r\n' +
-			'        <h4 class="modal-title"></h4>\r\n' +
-			'      </div>\r\n' +
-			'      <div class="modal-body">\r\n' +
-			'        \r\n' +
-			'      </div>\r\n' +
-			'      <div class="modal-footer">\r\n' +
-			'        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\r\n' +
-			'      </div>\r\n' +
-			'    </div>\r\n' +
-			'\r\n' +
-			'  </div>\r\n' +
-			'';
-		this.node.innerHTML = contents;
+			var contents = '\r\n' +
+				'  <div class="modal-dialog">\r\n' +
+				'\r\n' +
+				'    <div class="modal-content">\r\n' +
+				'      <div class="modal-header">\r\n' +
+				'        <button type="button" class="close" data-dismiss="modal">&times;</button>\r\n' +
+				'        <h4 class="modal-title"></h4>\r\n' +
+				'      </div>\r\n' +
+				'      <div class="modal-body">\r\n' +
+				'        \r\n' +
+				'      </div>\r\n' +
+				'      <div class="modal-footer">\r\n' +
+				'        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\r\n' +
+				'      </div>\r\n' +
+				'    </div>\r\n' +
+				'\r\n' +
+				'  </div>\r\n' +
+				'';
+			this.node.innerHTML = contents;
 
 	}
 
@@ -960,28 +959,33 @@ export class BootstrapModalViewTargetRequest {
 	public render(element: HTMLElement) {
 		this.node.querySelector('.modal-body').appendChild(element);
 		var footer = this.node.querySelector('.modal-footer');
-
+	    var startHash = window.location.hash;
 		this.modal = $(this.node).modal();
 		$(this.modal).on('hidden.bs.modal', () => {
 			this.modal.modal('hide').data('bs.modal', null);
-			this.node.parentElement.removeChild(this.node);
+            this.node.parentElement.removeChild(this.node);
+            if (startHash === window.location.hash) {
+                window.history.go(-1);
+            }
 		});
 
-		var buttons = element.querySelectorAll('button,input[type="submit"],input[type="button"]');
+        var buttons = element.querySelectorAll('button,input[type="submit"],input[type="button"]');
 		if (buttons.length > 0) {
 			while (footer.firstChild) {
 				footer.removeChild(footer.firstChild);
-			}
-			for (var i = 0; i < buttons.length; i++) {
-				(<HTMLElement>buttons[i]).className += ' btn';
-				(<HTMLElement>buttons[i]).addEventListener('click', e => {
-					this.modal.modal('hide');
-					if ((buttons[i].tagName == "input" && buttons[i].type !== "submit") || buttons[i].hasAttribute("data-dismiss")){
-						window.history.go(-1);
-					}
-				});
-				footer.appendChild(buttons[i]);
-			}
+            }
+		    var self = this;
+            for (var i = 0; i < buttons.length; i++) {
+                var button = <HTMLElement>buttons[i];
+                button.className += ' btn';
+                button.addEventListener('click', function (button, e) {
+                    self.modal.modal('hide');
+                    if ((button.tagName === "input" && button.getAttribute("type") !== "submit") || button.hasAttribute("data-dismiss")) {
+                        window.history.go(-1);
+                    }
+                }.bind(this, button));
+                footer.appendChild(buttons[i]);
+            }
 			if (buttons.length === 1) {
 				(<HTMLElement>buttons[0]).className += ' btn-primary';
 			} else {
@@ -1575,7 +1579,7 @@ export class Selector {
 		}
 
 		if (idOrselector.match(/[\s\.\,\[]+/g) === null) {
-			var result = this.scope.querySelector(`[data-name='${idOrselector}'],[data-collection='${idOrselector}'],[name="${idOrselector}"],#${idOrselector}`);
+			var result = this.scope.querySelector(`[data-name='${idOrselector}'],[name="${idOrselector}"],#${idOrselector}`);
 			if (result)
 				return result;
 		}
@@ -1589,7 +1593,7 @@ export class Selector {
 		const result: HTMLElement[] = [];
 
 		const items = selector.match("[\s\.,\[]+").length === 0
-			? this.scope.querySelectorAll(`[data-name="${selector}"],[data-collection='${selector}'],[name="${selector}"],#${selector}`)
+			? this.scope.querySelectorAll(`[data-name="${selector}"],[name="${selector}"],#${selector}`)
 			: this.scope.querySelectorAll(selector);
 		for (let i = 0; i < items.length; i++) {
 			result.push(<HTMLElement>items[i]);
@@ -1620,11 +1624,7 @@ export class ViewRenderer {
 	 */
 	constructor(elemOrName: HTMLElement|string) {
 		if (typeof elemOrName === "string") {
-			if (elemOrName.substr(0,1) === "#") {
-				this.container = document.getElementById(elemOrName.substr(1));
-			} else {
-				this.container = <HTMLElement>document.querySelector(`[data-name='${elemOrName}'],[data-collection='${elemOrName}'],#${elemOrName},[name="${elemOrName}"]`);
-			}
+			this.container = <HTMLElement>document.querySelector("#" + elemOrName + ",[data-name=\"" + elemOrName + "\"]");
 			if (!this.container) {
 				throw new Error("Failed to locate '" + elemOrName + "'.");
 			}
@@ -1907,7 +1907,7 @@ GlobalConfig.resourceLocator = {
 			const pos = window.location.pathname.lastIndexOf("/");
 			path = window.location.pathname.substr(0, pos);
 		}
-		if (path.substring(-1, 1) === "/") {
+		if (path.substring(-1, 1) === '/') {
 			path = path.substring(0, -1);
 		}
 		return path + `/Views/${section}.html`;
@@ -1918,7 +1918,7 @@ GlobalConfig.resourceLocator = {
 			const pos = window.location.pathname.lastIndexOf("/");
 			path = window.location.pathname.substr(0, pos);
 		}
-		if (path.substring(-1, 1) === "/") {
+		if (path.substring(-1, 1) === '/') {
 			path = path.substring(0, -1);
 		}
 		return path + `/ViewModels/${section}ViewModel.js`;
