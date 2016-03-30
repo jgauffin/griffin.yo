@@ -52,8 +52,17 @@ module Griffin.Yo.Views {
         }
 
         private renderElement(element: HTMLElement, data: any, directives: any = {}) {
-            this.log('renderElement', this.getName(element));
-            if (element.childElementCount === 0 && this.hasName(element)) {
+			var elementName = this.getName(element);
+			if (elementName) {
+				this.log('renderElement', this.getName(element));
+			}
+            if (element.childElementCount === 0 && elementName) {
+				
+				// we are the bottom element, but the data is not at the bottom yet.
+				if (data && data.hasOwnProperty(elementName)) {
+					data = data[elementName];
+				}
+				
                 data = this.runDirectives(element, data);
                 if (directives) {
                     if (this.applyEmbeddedDirectives(element, data, directives)) {
@@ -131,10 +140,22 @@ module Griffin.Yo.Views {
                     this.dtoStack.pop();
                     this.lineage.pop();
                 } else {
-                    if (childData instanceof Array){
-                        throw "'" + name + "' is not set as a collection, but the data is an array.";
-                    }
-                    
+					if(item.getAttribute("data-unless") === name) {
+						if (childData){
+							item.style.display = "none";
+						}
+					}
+                    else if (childData instanceof Array) {
+						var wrapper = document.createElement('div');
+						wrapper.appendChild(item.cloneNode(true));
+						var elementHtml = wrapper.innerHTML;
+						var elemPath = name;
+						if (this.lineage.length > 0) {
+							elemPath = this.lineage.join();
+						}
+						throw "'" + name + "' is not set as a collection, but the data is an array.\nElement: " + elementHtml + "\nData: " + JSON.stringify(childData, null, 4);
+					}
+					
                     this.lineage.push(name);
                     this.dtoStack.push(childData);
                     this.renderElement(item, childData, childDirective);

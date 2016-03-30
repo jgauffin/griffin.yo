@@ -127,6 +127,7 @@ module Griffin.Yo.Spa {
         }
 
         invoke(ctx: Routing.IRouteExecutionContext): void {
+			var self = this;
             this.ensureResources(() => {
                 var viewElem = document.createElement("div");
                 viewElem.className = "ViewContainer";
@@ -191,8 +192,31 @@ module Griffin.Yo.Spa {
                         const allIfs = viewElem.querySelectorAll("[data-if]");
                         for (let j = 0; j < allIfs.length; j++) {
                             let elem = allIfs[j];
-                            let value = elem.nodeValue;
-                            let result = this.evalInContext(value, { model: this.viewModel, ctx: ctx });
+							var condition = elem.getAttribute("data-if");
+							
+							//if can also be used during the rendering loop
+							if (condition.substr(0,3) != 'vm.' && condition.substr(0,6) != 'model.' && condition.substr(0,4) != 'ctx.') {
+								continue;
+							}
+							
+							//model is for backwards compability.
+                            let result = self.evalInContext(condition, { model: vm, ctx: ctx, vm:vm });
+                            if (!result) {
+                                elem.parentNode.removeChild(elem);
+                            }
+                        }
+
+						const allUnless = viewElem.querySelectorAll("[data-unless]");
+                        for (let j = 0; j < allUnless.length; j++) {
+                            let elem = allUnless[j];
+							var condition = elem.getAttribute("data-unless");
+							
+							//if can also be used during the rendering loop
+							if (condition.substr(0,3) != 'vm.' && condition.substr(0,6) != 'model.' && condition.substr(0,4) != 'ctx.') {
+								continue;
+							}
+							
+                            let result = self.evalInContext(condition, { ctx: ctx, vm:vm });
                             if (!result) {
                                 elem.parentNode.removeChild(elem);
                             }
