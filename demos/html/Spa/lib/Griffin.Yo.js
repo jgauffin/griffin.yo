@@ -1266,7 +1266,7 @@ var Griffin;
                         this.log('renderElement', this.getName(element));
                     }
                     if (element.childElementCount === 0 && elementName) {
-                        if (data.hasOwnProperty(elementName)) {
+                        if (data && data.hasOwnProperty(elementName)) {
                             data = data[elementName];
                         }
                         data = this.runDirectives(element, data);
