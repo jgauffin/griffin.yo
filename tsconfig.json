@@ -10,14 +10,14 @@
         "moduleResolution": "classic"
     },
     "files": [
-        "src2/Dom.ts",
-        "src2/Net.ts",
-        "src2/Routing.ts",
-        "src2/Routing.ViewTargets.ts",
-        "src2/Spa.ts",
-        "src2/Spa.ViewModels.ts",
-        "src2/Views.ts",
-        "src2/G.ts",
-        "src2/GlobalConfig.ts"
+        "src/Dom.ts",
+        "src/Net.ts",
+        "src/Routing.ts",
+        "src/Routing.ViewTargets.ts",
+        "src/Spa.ts",
+        "src/Spa.ViewModels.ts",
+        "src/Views.ts",
+        "src/G.ts",
+        "src/GlobalConfig.ts"
     ]
 }

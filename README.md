@@ -2,6 +2,8 @@
 
 An easy SPA library written in TypeScript. Either use it as a complete SPA framework, or use any of the classes directly (view render, router, view model handler, http client).
 
+The `bin` folder contains the scripts that you should use in your projects.
+
 ***Got no dependencies, not even on jQuery***
 
 Supports:

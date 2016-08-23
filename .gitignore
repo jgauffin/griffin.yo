@@ -20,6 +20,7 @@ Thumbs.db
 *.ilk
 *.log
 [Bb]in
+!/[Bb]in/
 [Dd]ebug*/
 *.lib
 *.sbr
@@ -28,3 +29,4 @@ obj/
 _ReSharper*/
 [Tt]est[Rr]esult*
 demos/aspnet/packages/*
+
