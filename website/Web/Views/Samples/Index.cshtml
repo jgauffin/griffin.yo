@@ -1,0 +1,67 @@
+﻿@model Web.Models.Demo
+@{
+    ViewBag.Title = "Demos - " + Model.Title;
+}
+<style>
+    .null, .boolean { color: blue; font-weight: bold; }
+    .number {color:red;}
+    .string {color: green }
+    .key { font-weight: bold;}
+</style>
+<h2>@Model.Title</h2>
+<div class="description">
+    <em>
+        @Model.Description
+    </em>
+</div>
+
+<h2>View</h2>
+<div id="View">
+    <pre><code class="html">@Model.View</code></pre>
+
+</div>
+
+<h2>Script</h2>
+<div id="Script">
+    <pre><code class="javascript">@Model.Script</code></pre>
+</div>
+
+<h2>Demo</h2>
+<hr />
+<div id="MyView">
+    @Html.Raw(Model.View)
+</div>
+@section scripts
+{
+    <script>
+        function syntaxHighlight(json) {
+            if (typeof json != 'string') {
+                json = JSON.stringify(json, undefined, 2);
+            }
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                var cls = 'number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'key';
+                    } else {
+                        cls = 'string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+        $(document).ready(function () {
+            $('pre code').each(function (i, block) {
+                hljs.highlightBlock(block);
+            });
+        });
+    </script>
+    @Html.Raw(Model.Script)
+}
+
+

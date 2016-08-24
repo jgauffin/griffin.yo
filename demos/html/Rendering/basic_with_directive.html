@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Using directives when rendering</title>
+    <title>Basic rendering (using directives)</title>
     <link rel="stylesheet" href="../css/site.css" />
 </head>
 
@@ -11,7 +11,7 @@
     <div id="content-wrapper">
 
         <h1>Using directives</h1>
-        <p>Directives enable you do two control how the JSON data is rendered. It can be to generate composite properties or
+        <p id="Description">Directives enable you do two control how the JSON data is rendered. It can be to generate composite properties or
             as in this example dynamically style the contents.
         </p>
         <h2>View</h2>
@@ -44,9 +44,8 @@ document.getElementById('withHtml').addEventListener('click', function(e) {
         <div class="result">
             <div id="MyView">
                 <h2 data-name="Name"></h2>
+                <button id="withHtml">Render with HTML instead</button>
             </div>
-
-            <button id="withHtml">Render with HTML instead</button>
         </div>
 
     </div>
@@ -56,7 +55,7 @@ document.getElementById('withHtml').addEventListener('click', function(e) {
     <script>
         $("#menu").load("../menu.html");
     </script>
-    <script type="text/javascript">
+    <script id="example-script" type="text/javascript">
         var Yo = Griffin.Yo;
             
             var directives = {  Name: {

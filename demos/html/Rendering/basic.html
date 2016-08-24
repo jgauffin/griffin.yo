@@ -1,52 +1,53 @@
 <!doctype html>
 <html lang="en">
 
-<head>
-    <title>Basic rendering</title>
-    <link rel="stylesheet" href="../css/site.css" />
-</head>
+    <head>
+        <title>Basic rendering</title>
+        <link rel="stylesheet" href="../css/site.css" />
+    </head>
 
-<body>
-    <div id="menu"></div>
-    <div id="content-wrapper">
-
-        <h1>Rendering data</h1>
-        <p>Server data (JSON objects) is a first class citizen in Griffin.Yo. Typically the information that you display for
+    <body>
+        <div id="menu"/>
+        <div id="content-wrapper">
+            <div id="Description">
+                <h1>Rendering data</h1>
+                <p>Server data (JSON objects) is a first class citizen in Griffin.Yo. Typically the information that you display for
             the user is generated server side. With Griffin.Yo it takes just one line of code to populate your view with
             it.
-        </p>
-        <h2>View</h2>
-        <pre><code>&lt;div id="MyView">
+                </p>
+            </div>
+            <h2>View</h2>
+            <pre><code>&lt;div id="MyView">
     &lt;h2 data-name="Name"></h2>
 &lt;/div>
-</pre></code>
-        <h2>Code</h2><pre><code>
-//from anywhere
+            </pre></code>
+        <h2>Code</h2>
+        <pre><code>//from anywhere
 Griffin.Yo.G.render('MyView', { Name: 'Arne' });
 
 //from your view model
 context.render({ Name: 'Arne' });
-    </code></pre>
+            </code></pre>
         <h2>Result</h2>
         <div class="result">
 
             <div id="MyView">
-                <h2 data-name="Name"></h2>
+                <h2 data-name="Name"/>
             </div>
         </div>
     </div>
-    <div class="clearfix"></div>
-    <script src="../lib/jquery-2.1.4.min.js"></script>
-    <script src="../lib/Griffin.Yo.js"></script>
+    <div class="clearfix"/>
+    <script src="../lib/jquery-2.1.4.min.js"/>
+    <script src="../lib/Griffin.Yo.js"/>
     <script>
         $("#menu").load("../menu.html");
     </script>
-    <script type="text/javascript">
+    <script id="example-script" type="text/javascript">
         var Yo = Griffin.Yo;
-            
+
             //either
             Yo.G.render('MyView', { Name: 'Arne' });
-            
+
             // .. or ..
             var r = new Yo.Views.ViewRenderer('MyView');
             r.render({ Name: 'Arne2' });

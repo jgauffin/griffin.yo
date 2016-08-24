@@ -2,13 +2,13 @@
 <html lang="en">
 
 <head>
-    <title>Demo</title>
+    <title>Render complex object</title>
     <link rel="stylesheet" href="../css/site.css" />
 </head>
 
 <body>
     <h1>Complex object</h1>
-    <p>Complex objects are object graphs that span over more than one level. Griffin.Yo can render complex structures without
+    <p id="Description">Complex objects are object graphs that span over more than one level. Griffin.Yo can render complex structures without
         you having to do anything special. Just create the same structure in your view.
         <h2>View</h2>
         <pre><code>&lt;div id="MyView">
@@ -30,16 +30,17 @@
 context.render(data);
   </code></pre>
         <h2>Result</h2>
-        <div class="result" <div id="MyView">
-            <h2 data-name="FirstName"></h2>
-            <div data-name="Address">
-                <span data-name="PostalCode"></span>
-                <span data-name="City"></span>
+        <div class="result">
+            <div id="MyView">
+                <h2 data-name="FirstName"></h2>
+                <div data-name="Address">
+                    <span data-name="PostalCode"></span>
+                    <span data-name="City"></span>
+                </div>
             </div>
         </div>
-        </div>
         <script src="../lib/Griffin.Yo.js"></script>
-        <script type="text/javascript">
+        <script id="example-script" type="text/javascript">
             var Yo = Griffin.Yo;
             var data = { 
                 FirstName: "Jonas",

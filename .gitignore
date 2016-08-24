@@ -30,3 +30,4 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 demos/aspnet/packages/*
 
+website/packages/*/

@@ -8,16 +8,22 @@
         </style>
     </head>
     <body>
+        <div id="Description">
+            This sampel shows how a form can be translated into a JSON object with a single line of code.
+        </div>
         <div id="MyView">
             <div>
                 <label>First name:</label> 
-                <input name="FirstName" value="Jonas" /></div>
+                <input name="FirstName" value="Jonas" />
+            </div>
             <div>
                 <label>Last name:</label> 
-                <input name="LastName" value="Gauffin" /></div>
+                <input name="LastName" value="Gauffin" />
+            </div>
             <div>
                 <label>Age:</label> 
-                <input name="Age" value="20" /></div>
+                <input name="Age" value="20" />
+            </div>
             <div>
                 <label>Mood</label> 
                 <input type="radio" name="Mood" value="Rocking" /> Rocking 
@@ -42,7 +48,8 @@
                 <br />
                 <label>City:</label> 
                 <input name="City" value="Falun" />
-                <br /></div>
+                <br />
+            </div>
             <div>
                 <h2>Address2</h2>
                 <label>Street:</label> 
@@ -53,25 +60,40 @@
                 <br />
                 <label>City:</label> 
                 <input name="Address2.City" value="Falun" />
-                <br /></div>
+                <br />
+            </div>
             <div data-collection="Brands">
                 <label>Your favorite brands</label>
-                <p>In reality you and new inputs using javascript and a button. Just imagine that it&#39;s been done here</p>
-                <input name="[]" value="Headlight" /> 
-                <input name="[]" value="OneTrueError" /> 
-                <input name="[]" value="Griffin.Framework" /></div>
+                <div>
+                    <em>Here you would you add new inputs using javascript and an 'add' button. Just imagine that it&#39;s been done here</em>
+                </div>
+                <input type="text" name="[]" value="Headlight" /> 
+                <input type="text" name="[]" value="OneTrueError" /> 
+                <input type="text" name="[]" value="Griffin.Framework" />
+            </div>
+            <button id="submit">Submit</button> 
         </div>
-        <button id="submit">Submit</button> 
-        <script src="../../../bin/Griffin.Yo.js"></script> 
-        <script type="text/javascript">
+        <script src="../../../bin/Griffin.Yo.js"> </script>
+        <script id="example-script" type="text/javascript">
             var Yo = Griffin.Yo;
             document.getElementById("submit").addEventListener("click", function(e) {
+            
+                //form to read
                 var form = new Yo.Dom.FormReader("MyView");
+                
+                //get the JSON object
                 var dto = form.read();
+                
+                //finally display it
                 var node = document.createElement("div");
-                node.innerText = "Pulled data: " + JSON.stringify(dto);
-                document.body.appendChild(node);
+                var json = JSON.stringify(dto, null, 4);
+                if (syntaxHighlight){
+                    json = syntaxHighlight(json);
+                }
+                node.innerHTML = "<h3>Result</h3><div>Pulled data: <pre>" + json + "</pre></div>";
+                document.getElementById('MyView').appendChild(node);
             });
 
-        </script></body>
+        </script>
+    </body>
 </html>
