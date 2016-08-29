@@ -1,0 +1,105 @@
+﻿@model Web.Models.CodeSample
+@{
+    ViewBag.Title = "Demos - " + Model.Title;
+}
+<style>
+    .null, .boolean { color: blue; font-weight: bold; }
+    .number {color:red;}
+    .string {color: green }
+    .key { font-weight: bold;}
+</style>
+<h2>@Model.Title</h2>
+<div class="description">
+    <em>
+        @Model.Description
+    </em>
+</div>
+
+<h2>Main view</h2>
+<div id="View">
+    <pre><code class="html">@Model.View</code></pre>
+</div>
+
+<h2>SPA setup</h2>
+<div id="Script">
+    <pre><code class="javascript">@Model.Script</code></pre>
+</div>
+
+<h2>Example file browser</h2>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4" style="overflow: scroll" id="example-files">
+            @foreach (var file in Model.Files)
+            {
+                <a href="@file">@file</a><br/>
+            }
+        </div>
+        <div class="col-lg-8" id="file-content">
+            
+        </div>
+    </div>
+</div>
+<h2>View (for model)</h2>
+<div id="ModelView">
+    <pre><code class="html"></code></pre>
+
+</div>
+
+<h2>ViewModel</h2>
+<div id="ViewModel">
+    <pre><code class="javascript"></code></pre>
+</div>
+
+<h2>Demo</h2>
+<hr />
+<div id="MyView">
+    @Html.Raw(Model.View)
+</div>
+@section scripts
+{
+    <script>
+        function syntaxHighlight(json) {
+            if (typeof json != 'string') {
+                json = JSON.stringify(json, undefined, 2);
+            }
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                var cls = 'number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'key';
+                    } else {
+                        cls = 'string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+        $(document).ready(function () {
+            $('pre code').each(function (i, block) {
+                hljs.highlightBlock(block);
+            });
+        });
+        var routeName = '@Model.RouteSection';
+        $('#example-files')
+            .click(function(e) {
+                e.preventDefault();
+                var url = '@Url.Content("~/sample/download/" + Model.Filename + "/" + Model.Section)' +
+                    $(this).attr('href');
+                $.get(url,
+                    function(data) {
+                        if (@(Model.Filename.EndsWith(".html")?"true":"false")) {
+                            data = data.replace(/\</g, "&lt;");
+                        }
+                        $('#file-content').html(data);
+                    });
+            });
+    </script>
+    @Html.Raw(Model.Script)
+}
+
+

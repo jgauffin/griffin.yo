@@ -3,21 +3,15 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Web;
 using System.Web.Hosting;
-using CsQuery;
 
 namespace Web.Models
 {
     public class ExampleReader
     {
-        public IEnumerable<Demo> Read()
+        public IEnumerable<CodeSample> ReadSection(string sectionName)
         {
-            var demoDirectory = ConfigurationManager.AppSettings["DemoDirectory"];
-            demoDirectory = Path.Combine(HostingEnvironment.MapPath("~/"), demoDirectory);
-            demoDirectory = Path.GetFullPath(demoDirectory);
-
-            var files = Directory.GetFiles(Path.Combine(demoDirectory, "Forms"), "*.html");
+            var files = Directory.GetFiles(Path.Combine(DemoDirectory, sectionName), "*.html");
             foreach (var file in files)
             {
                 var content = File.ReadAllText(file);
@@ -40,23 +34,130 @@ namespace Web.Models
                 var script = selector.QuerySelector("#example-script").OuterHtml;
                 script = script.Replace("\r\n		", "");
                 script = script.Replace("\r\n        ", "");
-                yield return new Demo
+                yield return new CodeSample
                 {
                     Title = title,
                     Description = description,
                     View = view,
-                    Script = script
+                    Script = script,
+                    Filename = Path.GetFileNameWithoutExtension(file),
+                    Section = sectionName
                 };
             }
 
         }
-    }
 
-    public class Demo
-    {
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public string View { get; set; }
-        public string Script { get; set; }
+        public IEnumerable<CodeSample> ReadSpaSection()
+        {
+            var dirs = Directory.GetDirectories(Path.Combine(DemoDirectory, "Spa"));
+            foreach (var dir in dirs)
+            {
+                if (dir.EndsWith("lib"))
+                    continue;
+
+                var file = Directory.GetFiles(dir, "*.html").First();
+                var content = File.ReadAllText(file);
+                var parser = new AngleSharp.Parser.Html.HtmlParser();
+                var selector = parser.Parse(content);
+
+                //var cq=CQ.CreateDocument(content);
+                var title = selector.Title;
+                if (title == "Demo")
+                {
+                    var pos = dir.TrimEnd('\\').LastIndexOf('\\');
+                    title = dir.Substring(pos).TrimEnd('\\');
+                    title = char.ToUpper(title[0]) + title.Substring(1);
+                }
+                var description = selector.QuerySelector("#Description")?.InnerHtml;
+                var view = (selector.QuerySelector("#MyView") ?? selector.QuerySelector("#YoView")).InnerHtml;
+                view = view.Replace("\r\n			", "");
+                view = view.Replace("\r\n            ", "");
+
+                var files = GenerateFileList(dir);
+
+                string routeSection = null;
+                string script = null;
+                var exampleScript = selector.QuerySelector("#example-script");
+                if (exampleScript != null)
+                {
+                    routeSection = exampleScript.GetAttribute("section");
+                    script = selector.QuerySelector("#example-script").OuterHtml;
+                    script = script.Replace("\r\n		", "");
+                    script = script.Replace("\r\n        ", "");
+                }
+                yield return new CodeSample
+                {
+                    Title = title.Replace(".", " - "),
+                    Description = description,
+                    View = view,
+                    Script = script,
+                    Filename = Path.GetFileNameWithoutExtension(file),
+                    Section = "SPA",
+                    RouteSection = routeSection,
+                    Files = files
+                };
+            }
+
+        }
+
+        private static List<string> GenerateFileList(string dir)
+        {
+            List<string> files = new List<string>();
+            foreach (var subdir in Directory.GetDirectories(dir))
+            {
+                GenerateFileList(dir, subdir, files);
+            }
+            return files;
+        }
+
+        private static List<string> GenerateFileList(string rootDir, string dir, List<string> files)
+        {
+            foreach (var subFile in Directory.GetFiles(rootDir))
+            {
+                var name = subFile.Remove(0, rootDir.Length + 1);
+                files.Add(name);
+            }
+
+            foreach (var subdir in Directory.GetDirectories(dir))
+            {
+                GenerateFileList(rootDir, subdir, files);
+            }
+            return files;
+        }
+
+        public IEnumerable<CodeSample> Read()
+        {
+
+            foreach (var sample in ReadSection("Forms"))
+            {
+                yield return sample;
+            }
+            foreach (var sample in ReadSection("Rendering"))
+            {
+                yield return sample;
+            }
+            foreach (var sample in ReadSpaSection())
+            {
+                yield return sample;
+            }
+
+        }
+
+        private string DemoDirectory
+        {
+            get
+            {
+                var demoDirectory = ConfigurationManager.AppSettings["DemoDirectory"];
+                demoDirectory = Path.Combine(HostingEnvironment.MapPath("~/"), demoDirectory);
+                demoDirectory = Path.GetFullPath(demoDirectory);
+                return demoDirectory;
+            }
+        }
+
+        public string GetViewModel(CodeSample sample, string modelName)
+        {
+            var directory = Path.Combine(DemoDirectory, "Spa", sample.Filename, "ViewModels", modelName + "ViewModel.js");
+            return File.ReadAllText(directory);
+        }
     }
 }

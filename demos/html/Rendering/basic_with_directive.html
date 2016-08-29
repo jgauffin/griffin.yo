@@ -58,20 +58,21 @@ document.getElementById('withHtml').addEventListener('click', function(e) {
     <script id="example-script" type="text/javascript">
         var Yo = Griffin.Yo;
             
-            var directives = {  Name: {
-                                    text(value) { return value + ' <span>(HTML as text)</span>'; },
-                                    style(value) { return 'color: red'; },
-                                    class(value) { return 'someClass'; }
-                                }
-                            };
-            Yo.G.render('MyView', { Name: 'Arne' }, directives);
-            
-            
-            // use "html" to allow HTML in the data.
-            document.getElementById('withHtml').addEventListener('click', function(e) {
-                e.preventDefault();
-                Yo.G.render('MyView', { Name: 'Arne' }, { Name: { html(value) { return value + ' <span>(HTML as text)</span>'; } } });
-            });
+        var directives = {  Name: {
+                                text(value) { return value + ' <span>(HTML as text)</span>'; },
+                                style(value) { return 'color: red'; },
+                                class(value) { return 'someClass'; }
+                            }
+                        };
+        Yo.G.render('MyView', { Name: 'Arne' }, directives);
+        
+        
+        // use "html" to allow HTML in the data.
+        document.getElementById('withHtml').addEventListener('click', function(e) {
+            e.preventDefault();
+            var partialDirective = { Name: { html(value) { return value + ' <span>(HTML as text)</span>'; } } };
+            Yo.G.render('MyView', { Name: 'Arne' }, partialDirective);
+        });
     </script>
 </body>
 

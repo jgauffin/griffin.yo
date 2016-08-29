@@ -2,14 +2,13 @@
 <html lang="en">
 
 <head>
-    <title>Examples - Collections</title>
+    <title>Rendering collections</title>
     <link rel="stylesheet" href="../css/site.css" />
-
 </head>
 
 <body>
     <h1>Collections</h1>
-    <p>Collections can be rendered to any type of objects. It do not have to be a table or a list, it can be a plain div.</p>
+    <p id="Description">Collections can be rendered to any type of objects. The target do not have to be a table or a list, it can be a plain div.</p>
     <h2>View</h2>
     <pre><code>&lt;div id="MyView">
     &lt;h2 data-name="Title">&lt;/h2>
@@ -33,10 +32,10 @@ Yo.G.render('MyView', dto);
         </div>
     </div>
     <script src="../lib/Griffin.Yo.js"></script>
-    <script type="text/javascript">
+    <script id="example-script" type="text/javascript">
         var Yo = Griffin.Yo;
-            var dto = { Title: 'Hello world', Items: ['Adam', 'Bertil', 'Ceasar'] };
-            Yo.G.render('MyView', dto);
+        var dto = { Title: 'Hello world', Items: ['Adam', 'Bertil', 'Ceasar'] };
+        Yo.G.render('MyView', dto);
     </script>
 </body>
 

@@ -1,24 +1,22 @@
 <!doctype html>
 <html lang="en">
-
-<head>
-    <title>Examples - Styled collection</title>
+    <head>
+        <title>Rendering a collection (zebra stripes)</title>
         <link rel="stylesheet" href="../css/site.css" />
 
-</head>
-
-<body>
-    <h1>Styling list using directies</h1>
-    <p>You can use directives to do styling. For instance if you would like to use zebra stripes.</p>.
-    <h2>View</h2>
-    <pre><code>&lt;div id="MyView">
+    </head>
+    <body>
+        <h1>Styling list using directies</h1>
+        <p id="Description">You can use directives to do styling. For instance if you would like to use zebra stripes.</p>.
+        <h2>View</h2>
+        <pre><code>&lt;div id="MyView">
     &lt;h2 id="Title">&lt;/h2>
     &lt;ul>
         &lt;li data-collection="Items">&lt;span data-name="Name">&lt;/span>&lt;/li>
     &lt;/ul>
 &lt;/div></code></pre>
-    <h2>Code</h2>
-    <pre><code>var directives = { 
+        <h2>Code</h2>
+        <pre><code>var directives = { 
     Items: { 
         Name: { 
             style(value) { return 'font-size: 20pt;'; } 
@@ -34,17 +32,19 @@ var data = {
     ]
 };
 Yo.G.render('MyView', data, directives);</code></pre>
-    <h2>Result</h2>
-    <div class="result">
-        <div id="MyView">
-            <h2 id="Title"></h2>
-            <ul>
-                <li data-collection="Items"><span data-name="Name"></span></li>
-            </ul>
+        <h2>Result</h2>
+        <div class="result">
+            <div id="MyView">
+                <h2 id="Title"/>
+                <ul>
+                    <li data-collection="Items">
+                        <span data-name="Name"/>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-    <script src="../lib/Griffin.Yo.js"></script>
-    <script type="text/javascript">
+        <script src="../lib/Griffin.Yo.js"></script>
+        <script id="example-script" type="text/javascript">
         var Yo = Griffin.Yo;
         var directives = { 
             Items: { 
@@ -62,7 +62,7 @@ Yo.G.render('MyView', data, directives);</code></pre>
             ]
         };
         Yo.G.render('MyView', data, directives);
-    </script>
-</body>
+        </script>
+    </body>
 
 </html>

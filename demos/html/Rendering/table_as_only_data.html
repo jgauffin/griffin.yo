@@ -2,13 +2,13 @@
 <html lang="en">
 
 <head>
-    <title>Examples - collection as root data</title>
+    <title>Table - when data is just an array</title>
     <link rel="stylesheet" href="../css/site.css" />
 </head>
 
 <body>
     <h1>Collection as only data</h1>
-    <p>Some libraries have trouble if the data returned from the server is a collection. Griffin.Yo handles that.</p>
+    <p id="Description">Some libraries have trouble if the data returned from the server is a collection. Griffin.Yo handles that.</p>
     <h2>View</h2>
     <pre><code>&lt;div id="MyView">
     &lt;table>
@@ -43,16 +43,15 @@ Yo.G.render('DataTarget', [
         </div>
     </div>
     <script src="../lib/Griffin.Yo.js"></script>
-    <script type="text/javascript">
+    <script id="example-script" type="text/javascript">
         var Yo = Griffin.Yo;
             
-            //Need to point on the container as the renderer can't really tell
-            //what you want to get repeated.
-            Yo.G.render('DataTarget', [
-                { Name: 'Jonas', Address: { Postal: 12345, City: "Falun" }}, 
-                { Name: 'Tom', Address: { Postal: 54321, City: "Stockholm" }}
-            ]);
+        //Need to point on the container as the renderer can't really tell
+        //what you want to get repeated.
+        Yo.G.render('DataTarget', [
+            { Name: 'Jonas', Address: { Postal: 12345, City: "Falun" }}, 
+            { Name: 'Tom', Address: { Postal: 54321, City: "Stockholm" }}
+        ]);
     </script>
 </body>
-
 </html>
