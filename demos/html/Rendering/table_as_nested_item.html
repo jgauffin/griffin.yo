@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="en">
     <head>
-        <title>Demo</title>
+        <title>Table as child data</title>
     </head>
     <body>
+        <p id="Description">Rendering tables can be done for complex objects where the collection is a child</p>
         <div id="MyView">
             <h2 data-name="Title"></h2>
             <table>
@@ -15,11 +16,17 @@
             </table>
         </div>
         <script src="../../../bin/Griffin.Yo.js"></script>
-        <script type="text/javascript">
+        <script id="example-script" type="text/javascript">
             var Yo = Griffin.Yo;
+            var data = { Title: 'Hello world', 
+                         Items: [
+                            { UserName: 'Jonas', Age: '38', State: 'Kicking' },
+                            { UserName: 'Alfred', Age: '0.6', State: 'Crawling' }
+                        ]
+                    };
             
             //arrays as part of an object works just fine.
-            Yo.G.render('MyView', { Title: 'Hello world', Items: [{ UserName: 'Jonas', Age: '38', State: 'Kicking' }, { UserName: 'Alfred', Age: '0.6', State: 'Crawling' }] });
+            Yo.G.render('MyView', data);
             
         </script>
     </body>

@@ -1,28 +1,24 @@
 <!doctype html>
 <html lang="en">
-
-<head>
-    <title>Examples - Composite property</title>
-    <link rel="stylesheet" href="../css/site.css" />
-
-</head>
-
-<body>
-    <h1>Composite property</h1>
-            <p>This example illistrates how you can use directives to generate missing properties (or merge properties) without
+    <head>
+        <title>Collection - Composite property</title>
+        <link rel="stylesheet" href="../css/site.css" />
+    </head>
+    <body>
+        <h1>Composite property</h1>
+        <p id="Description">This example illustrates how you can use directives to generate missing properties (or merge properties) without
                 having to modify the JSON object that you got from the server.</p>
-<h2>View</h2>
-<pre><code>&lt;div id="MyView">
+        <h2>View</h2>
+        <pre><code>&lt;div id="MyView">
     &lt;h2 id="Title">&lt;/h2>
     &lt;ul>
         &lt;li data-collection="Items">
             &lt;span data-name="Name">&lt;/span>
         &lt;/li>
     &lt;/ul>
-&lt;/div>
-</code></pre>
-    <h2>Code</h2>
-    <pre><code>var directives = { 
+&lt;/div></code></pre>
+        <h2>Code</h2>
+        <pre><code>var directives = { 
     Items: { 
         Name: { text(value, dto) { return dto.FirstName; } } 
     } 
@@ -35,21 +31,22 @@ var data = {
         {FirstName: 'Ceasar'}
     ]
 };
-Yo.G.render('MyView', data, directives);
-</code></pre>
-    <h2>Result</h2>
-    <div class="result">
-        <div id="MyView">
-            <h2 id="Title"></h2>
-            <ul>
-                <li data-collection="Items"><span data-name="Name"></span></li>
-            </ul>
+Yo.G.render('MyView', data, directives);</code></pre>
+        <h2>Result</h2>
+        <div class="result">
+            <div id="MyView">
+                <h2 id="Title"/>
+                <ul>
+                    <li data-collection="Items">
+                        <span data-name="Name"/>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-    <script src="../lib/Griffin.Yo.js"></script>
-    <script type="text/javascript">
+        <script src="../lib/Griffin.Yo.js"></script>
+        <script id="example-script" type="text/javascript">
         var Yo = Griffin.Yo;
-        
+
         // the data do not have the property that we want to use.
         // let's generate it on the fly.
         var directives = { Items: { Name: { text(value, dto) { return dto.FirstName; } } } };
@@ -59,7 +56,7 @@ Yo.G.render('MyView', data, directives);
                 {FirstName: 'Bertil'},
                 {FirstName: 'Ceasar'}
             ]}, directives);
-    </script>
-</body>
+        </script>
+    </body>
 
 </html>

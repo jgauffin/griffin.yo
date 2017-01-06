@@ -1,17 +1,25 @@
 <!doctype html>
 <html lang="en">
     <head>
-        <title>Demo</title>
+        <title>Basic demo</title>
     </head>
     <body>
+        <div id="Description">
+            Minimal configuration to get the SPA engine running.
+        </div>
         <div id="YoView">
         </div>
         <script src="../lib/Griffin.Yo.js"></script>
-        <script type="text/javascript">
+        <script id="example-script" type="text/javascript" >
             var Yo = Griffin.Yo;
             console.log(window.location.pathname);
+            
             var spa = new Yo.Spa.SpaEngine("BasicApp");
+            
+            // not required for pure SPA applications
             spa.root = window.location.pathname;
+            
+            // tell which view model to load
             spa.mapRoute("/", "Home/Index");
             spa.run();
         </script>

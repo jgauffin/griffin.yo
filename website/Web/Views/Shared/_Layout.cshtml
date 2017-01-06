@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using Web.Models
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -18,15 +19,23 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("Griffin.Yo", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Home", "Index", "Home")</li>
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                    <li>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Samples <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            @foreach (CodeSample sample in ViewBag.Samples)
+                            {
+                                <li><a href="@Url.Content("/sample/" + sample.Filename)" title="@sample.Description">@sample.Section - @sample.Title</a></li>
+                            }
+                        </ul>
+                    </li>
                 </ul>
-                @Html.Partial("_LoginPartial")
             </div>
         </div>
     </div>
@@ -34,12 +43,19 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+            <p>&copy; @DateTime.Now.Year Jonas Gauffin</p>
         </footer>
     </div>
-
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    <script>
+        Griffin.Yo.GlobalConfig.resourceLocator.getHtml = function (section) {
+            return '@Url.Content("~/Sample/Html/")' + section + ".html";
+        }
+        Griffin.Yo.GlobalConfig.resourceLocator.getScript = function (section) {
+            return '@Url.Content("~/Sample/Script/")' + section + "ViewModel.js";
+        }
+    </script>
     @RenderSection("scripts", required: false)
 </body>
 </html>

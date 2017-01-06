@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Examples - Table with complex objects</title>
+    <title>Table with complex child objects</title>
     <link rel="stylesheet" href="../css/site.css" />
 </head>
 
@@ -10,7 +10,7 @@
     <div id="menu"></div>
     <div id="content-wrapper">
         <h1>Rendering a table using complex objects</h1>
-        <p>Griffin.Yo supports collections that consists of objects with deep object graphs.</p>
+        <p id="Description">Griffin.Yo supports collections that consists of objects with deep object graphs.</p>
         <h2>View</h2>
         <pre><code>&lt;div id="MyView">
     &lt;h2 id="Title">&lt;/h2>
@@ -56,19 +56,19 @@ Griffin.Yo.G.render('MyView', data);</code></pre>
     <script>
         $("#menu").load("../menu.html");
     </script>
-    <script type="text/javascript">
+    <script id="example-script" type="text/javascript">
         var Yo = Griffin.Yo;
             
-            var data = { 
-                Title: 'Hello world', 
-                Items: [
-                    { Name: 'Jonas', Address: { Postal: 12345, City: "Falun" }}, 
-                    { Name: 'Tom', Address: { Postal: 54321, City: "Stockholm" }}
-                ] 
-            };
-            //complex objects in arrays are no problem
-            Yo.G.render('MyView', data);
+        var data = { 
+            Title: 'Hello world', 
+            Items: [
+                { Name: 'Jonas', Address: { Postal: 12345, City: "Falun" }}, 
+                { Name: 'Tom', Address: { Postal: 54321, City: "Stockholm" }}
+            ] 
+        };
+        
+        //complex objects in arrays are no problem
+        Yo.G.render('MyView', data);
     </script>
 </body>
-
 </html>

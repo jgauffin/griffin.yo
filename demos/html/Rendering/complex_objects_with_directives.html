@@ -2,13 +2,13 @@
 <html lang="en">
 
 <head>
-    <title>Demo</title>
+    <title>Rendering complex objects (with directives)</title>
     <link rel="stylesheet" href="../css/site.css" />
 </head>
 
 <body>
     <h1>Complex object, customized data</h1>
-    <p>Sometimes the data that you recieve from the server side it's a 100% match for the view. The easiest thing to do then
+    <p id="Description">Sometimes the data that you recieve from the server side isn't a 100% match for the view. The easiest thing to do then
         is to modify it using directives.
     </p>
     <h2>View</h2>
@@ -54,31 +54,31 @@ Griffin.Yo.G.render('MyView', data, directives);</code></pre>
         </div>
     </div>
     <script src="../lib/Griffin.Yo.js"></script>
-    <script type="text/javascript">
+    <script id="example-script" type="text/javascript">
         var Yo = Griffin.Yo;
             
-            var data = { 
-                FirstName: "Jonas",
-                Address: {
-                    City: "Falun",
-                    PostalCode: "791 00"
+        var data = { 
+            FirstName: "Jonas",
+            Address: {
+                City: "Falun",
+                PostalCode: "791 00"
+            }
+        };
+        
+        // do not have to specify directives for everything.
+        var directives = {
+            FirstName: { 
+                //second argument is the object at the current level.
+                text(value, dto) { return value + " [" + dto.Address.PostalCode + "]"; }
+            },
+            Address: {
+                City: {
+                    //DTO = Address
+                    html(value, dto) { return '&lt;' + value + '&gt;'; }
                 }
-            };
-            
-            // do not have to specify directives for everything.
-            var directives = {
-                FirstName: { 
-                    //second argument is the object at the current level.
-                    text(value, dto) { return value + " [" + dto.Address.PostalCode + "]"; }
-                },
-                Address: {
-                    City: {
-                        //DTO = Address
-                        html(value, dto) { return '&lt;' + value + '&gt;'; }
-                    }
-                }
-            };
-            Yo.G.render('MyView', data, directives);
+            }
+        };
+        Yo.G.render('MyView', data, directives);
     </script>
 </body>
 
