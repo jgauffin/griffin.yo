@@ -459,10 +459,10 @@ var Griffin;
                         request.send();
                     }
                 };
-                Http.cache = {};
-                Http.useCaching = true;
                 return Http;
             }());
+            Http.cache = {};
+            Http.useCaching = true;
             Net.Http = Http;
         })(Net = Yo.Net || (Yo.Net = {}));
     })(Yo = Griffin.Yo || (Griffin.Yo = {}));
@@ -674,6 +674,7 @@ var Griffin;
                         this.node.querySelector('.modal-body').appendChild(element);
                         var footer = this.node.querySelector('.modal-footer');
                         this.modal = $(this.node).modal();
+                        var m = this.modal;
                         $(this.modal).on('hidden.bs.modal', function () {
                             _this.modal.modal('hide').data('bs.modal', null);
                             _this.node.parentElement.removeChild(_this.node);
@@ -686,8 +687,8 @@ var Griffin;
                             for (var i = 0; i < buttons.length; i++) {
                                 var button = buttons[i];
                                 button.className += ' btn';
-                                button.addEventListener('click', function (target, button, e) {
-                                    target.modal.modal('hide');
+                                button.addEventListener('click', function (button, e) {
+                                    this.modal('hide');
                                     if ((button.tagName === "input" && button.type !== "submit") || button.hasAttribute("data-dismiss")) {
                                         window.history.go(-1);
                                     }
@@ -802,9 +803,9 @@ var Griffin;
             var Config = (function () {
                 function Config() {
                 }
-                Config.applicationScope = {};
                 return Config;
             }());
+            Config.applicationScope = {};
             Spa.Config = Config;
             var RouteRunner = (function () {
                 function RouteRunner(section, applicationName) {
@@ -861,8 +862,11 @@ var Griffin;
                 RouteRunner.prototype.removeConditions = function (elem, context) {
                     for (var i = 0; i < elem.childElementCount; i++) {
                         var child = elem.children[i];
+                        if (!child.hasAttribute("data-if")) {
+                            continue;
+                        }
                         var ifStatement = child.getAttribute("data-if");
-                        var ifResult = !ifStatement || !this.evalInContext(ifStatement, context);
+                        var ifResult = this.evalInContext(ifStatement, context);
                         if (!ifResult) {
                             child.parentNode.removeChild(child);
                             continue;
@@ -1495,7 +1499,7 @@ var Griffin;
                 ViewRenderer.prototype.log = function () {
                     var args = [];
                     for (var _i = 0; _i < arguments.length; _i++) {
-                        args[_i - 0] = arguments[_i];
+                        args[_i] = arguments[_i];
                     }
                     if (ViewRenderer.DEBUG && console && console.log) {
                         args.unshift(this.dtoStack[this.dtoStack.length - 1]);
@@ -1509,10 +1513,10 @@ var Griffin;
                         console.log.apply(console, args);
                     }
                 };
-                ViewRenderer.globalValueDirectives = [];
-                ViewRenderer.DEBUG = false;
                 return ViewRenderer;
             }());
+            ViewRenderer.globalValueDirectives = [];
+            ViewRenderer.DEBUG = false;
             Views.ViewRenderer = ViewRenderer;
             var ViewValueDirectiveContext = (function () {
                 function ViewValueDirectiveContext() {
@@ -1534,10 +1538,10 @@ var Griffin;
                 var r = new Yo.Views.ViewRenderer(idOrElem);
                 r.render(dto, directives);
             };
-            G.select = new Yo.Dom.Selector();
-            G.handle = new Yo.Dom.EventMapper();
             return G;
         }());
+        G.select = new Yo.Dom.Selector();
+        G.handle = new Yo.Dom.EventMapper();
         Yo.G = G;
     })(Yo = Griffin.Yo || (Griffin.Yo = {}));
 })(Griffin || (Griffin = {}));
@@ -1548,9 +1552,9 @@ var Griffin;
         var GlobalConfig = (function () {
             function GlobalConfig() {
             }
-            GlobalConfig.applicationScope = {};
             return GlobalConfig;
         }());
+        GlobalConfig.applicationScope = {};
         Yo.GlobalConfig = GlobalConfig;
         GlobalConfig.resourceLocator = {
             getHtml: function (section) {

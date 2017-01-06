@@ -104,8 +104,12 @@ module Griffin.Yo.Spa {
         private removeConditions(elem: HTMLElement, context: any) {
             for (var i = 0; i < elem.childElementCount; i++) {
                 var child = elem.children[i];
+				if (!child.hasAttribute("data-if")) {
+					continue;
+				}
+				
                 var ifStatement = child.getAttribute("data-if");
-                var ifResult = !ifStatement || !this.evalInContext(ifStatement, context);
+                var ifResult = this.evalInContext(ifStatement, context);
                 if (!ifResult) {
                     child.parentNode.removeChild(child);
                     continue;

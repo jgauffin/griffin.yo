@@ -1016,8 +1016,8 @@ module Griffin.Yo.Routing.ViewTargets {
         public render(element: HTMLElement) {
             this.node.querySelector('.modal-body').appendChild(element);
             var footer = this.node.querySelector('.modal-footer');
-
             this.modal = $(this.node).modal();
+			var m = this.modal;
             $(this.modal).on('hidden.bs.modal', () => {
                 this.modal.modal('hide').data('bs.modal', null);
                 this.node.parentElement.removeChild(this.node);
@@ -1031,8 +1031,8 @@ module Griffin.Yo.Routing.ViewTargets {
                 for (var i = 0; i < buttons.length; i++) {
                     let button = <HTMLElement>buttons[i];
                     button.className += ' btn';
-                    button.addEventListener('click', function(target: BootstrapModalViewTargetRequest, button: HTMLElement, e: Event) {
-                        target.modal.modal('hide');
+                    button.addEventListener('click', function(button: HTMLElement, e: Event) {
+                        this.modal('hide');
                         if ((button.tagName === "input" && (<HTMLInputElement>button).type !== "submit") || button.hasAttribute("data-dismiss")) {
                             window.history.go(-1);
                         }
@@ -1212,8 +1212,12 @@ module Griffin.Yo.Spa {
         private removeConditions(elem: HTMLElement, context: any) {
             for (var i = 0; i < elem.childElementCount; i++) {
                 var child = elem.children[i];
+				if (!child.hasAttribute("data-if")) {
+					continue;
+				}
+				
                 var ifStatement = child.getAttribute("data-if");
-                var ifResult = !ifStatement || !this.evalInContext(ifStatement, context);
+                var ifResult = this.evalInContext(ifStatement, context);
                 if (!ifResult) {
                     child.parentNode.removeChild(child);
                     continue;
