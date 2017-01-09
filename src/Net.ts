@@ -28,7 +28,7 @@ module Griffin.Yo.Net {
             request.onload = () => {
                 if (request.status >= 200 && request.status < 400) {
                     if (request.status === 304) {
-                        request.responseText = this.cache[url].content;
+                        request["responseText"] = this.cache[url].content;
                     } else {
                         const header: string = request.getResponseHeader("Last-Modified");
                         if (header) {
@@ -40,7 +40,7 @@ module Griffin.Yo.Net {
                     }
 
                     if (contentType === "application/json") {
-                        request.responseBody = JSON.parse(request.responseText);
+                        request["responseBody"] = JSON.parse(request.responseText);
                         
                         //for browser that locks well defined objects
                         //(like IE)

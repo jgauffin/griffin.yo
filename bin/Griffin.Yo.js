@@ -198,8 +198,8 @@ var Griffin;
                             }
                             return this.processValue(input.value);
                         }
-                        else {
-                            var value3 = container.getAttribute('value') || '';
+                        else if (container.tagName == 'TEXTAREA') {
+                            var value3 = container.value;
                             return this.processValue(value3);
                         }
                     }
@@ -366,7 +366,7 @@ var Griffin;
                     request.onload = function () {
                         if (request.status >= 200 && request.status < 400) {
                             if (request.status === 304) {
-                                request.responseText = _this.cache[url].content;
+                                request["responseText"] = _this.cache[url].content;
                             }
                             else {
                                 var header = request.getResponseHeader("Last-Modified");
@@ -378,7 +378,7 @@ var Griffin;
                                 }
                             }
                             if (contentType === "application/json") {
-                                request.responseBody = JSON.parse(request.responseText);
+                                request["responseBody"] = JSON.parse(request.responseText);
                                 var tempFix = request;
                                 tempFix["responseJson"] = JSON.parse(request.responseText);
                             }

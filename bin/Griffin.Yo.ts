@@ -200,6 +200,7 @@ module Griffin.Yo.Dom {
 
 
 		private pullElement(container: HTMLElement): any {
+			//console.log(container, value3, container.childElementCount);
 			if (container.childElementCount === 0) {
 				if (container.tagName == 'SELECT') {
 					var select = <HTMLSelectElement>container;
@@ -209,6 +210,7 @@ module Griffin.Yo.Dom {
 					let value1 = <HTMLOptionElement>select.options[select.selectedIndex];
 					return this.processValue(value1.value);
 				} else if (container.tagName == 'INPUT') {
+				
 					var input = <HTMLInputElement>container;
 					var typeStr = container.getAttribute('type');
 					if (typeStr === 'radio' || typeStr === 'checkbox') {
@@ -218,8 +220,8 @@ module Griffin.Yo.Dom {
 						return null;
 					}
 					return this.processValue(input.value);
-				} else {
-					let value3 = container.getAttribute('value') || '';
+				} else if (container.tagName == 'TEXTAREA') {
+					let value3 = (<HTMLTextAreaElement>container).value;
 					return this.processValue(value3);
 				}
 			}
@@ -479,7 +481,7 @@ module Griffin.Yo.Net {
             request.onload = () => {
                 if (request.status >= 200 && request.status < 400) {
                     if (request.status === 304) {
-                        request.responseText = this.cache[url].content;
+                        request["responseText"] = this.cache[url].content;
                     } else {
                         const header: string = request.getResponseHeader("Last-Modified");
                         if (header) {
@@ -491,7 +493,7 @@ module Griffin.Yo.Net {
                     }
 
                     if (contentType === "application/json") {
-                        request.responseBody = JSON.parse(request.responseText);
+                        request["responseBody"] = JSON.parse(request.responseText);
                         
                         //for browser that locks well defined objects
                         //(like IE)
