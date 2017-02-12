@@ -200,17 +200,16 @@ module Griffin.Yo.Dom {
 
 
 		private pullElement(container: HTMLElement): any {
-			//console.log(container, value3, container.childElementCount);
+			if (container.tagName == 'SELECT') {
+				var select = <HTMLSelectElement>container;
+				if (select.selectedIndex == -1) {
+					return null;
+				}
+				let value1 = <HTMLOptionElement>select.options[select.selectedIndex];
+				return this.processValue(value1.value);
+			} 
 			if (container.childElementCount === 0) {
-				if (container.tagName == 'SELECT') {
-					var select = <HTMLSelectElement>container;
-					if (select.selectedIndex == -1) {
-						return null;
-					}
-					let value1 = <HTMLOptionElement>select.options[select.selectedIndex];
-					return this.processValue(value1.value);
-				} else if (container.tagName == 'INPUT') {
-				
+				if (container.tagName == 'INPUT') {
 					var input = <HTMLInputElement>container;
 					var typeStr = container.getAttribute('type');
 					if (typeStr === 'radio' || typeStr === 'checkbox') {

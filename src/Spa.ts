@@ -89,7 +89,11 @@ module Griffin.Yo.Spa {
 
 
                 var ifStatement = nav.getAttribute("data-if");
-                var ifResult = !ifStatement || !this.evalInContext(ifStatement, context);
+				if (!isStatement){
+					continue;
+				}
+				
+                var ifResult = this.evalInContext(ifStatement, context);
                 if (!ifResult) {
                     nav.parentNode.removeChild(nav);
                     continue;
@@ -109,6 +113,10 @@ module Griffin.Yo.Spa {
 				}
 				
                 var ifStatement = child.getAttribute("data-if");
+				if (!ifStatement) {
+					continue;
+				}
+				
                 var ifResult = this.evalInContext(ifStatement, context);
                 if (!ifResult) {
                     child.parentNode.removeChild(child);

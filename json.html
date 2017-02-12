@@ -1,0 +1,22 @@
+<html><head>
+<script src="bin/griffin.yo.js"></script>
+</head><body>
+
+                <form method="POST" action="@Url.Content("~/api/cqs")" id="support-form">
+                    <div class="form-group">
+                        <label for="Subject">Subject</label>
+                        <input type="text" class="form-control" name="Subject" placeholder="Enter subject" value="hello">
+                    </div>
+                    <div class="form-group">
+                        <label for="Message">Message</label>
+                        <textarea class="form-control" name="Message" id="Message" style="height: 400px; min-width: 100%; width: 550px;" placeholder="What do you have trouble with?">m00t</textarea>
+                    </div>
+                </form>
+				
+				
+				<script type="text/javascript">
+        var reader = new Griffin.Yo.Dom.FormReader("support-form");
+        var dto = reader.read();
+console.log(dto);
+</script>
+</body>

@@ -56,7 +56,18 @@ module Griffin.Yo.Views {
 			if (elementName) {
 				this.log('renderElement', this.getName(element));
 			}
-            if (element.childElementCount === 0 && elementName) {
+			
+			if (elementName && element.tagName === "SELECT") {
+                    var sel = <HTMLSelectElement>element;
+                    for (var j = 0; j < sel.options.length; j++) {
+                        var opt = <HTMLOptionElement>sel.options[j];
+                        if (opt.value === data || opt.label === data) {
+                            this.log('setting option ' + opt.label + " to selected");
+                            opt.selected = true;
+                            break;
+                        }
+			}
+            else if (element.childElementCount === 0 && elementName) {
 				
 				// we are the bottom element, but the data is not at the bottom yet.
 				if (data && data.hasOwnProperty(elementName)) {
@@ -84,16 +95,6 @@ module Griffin.Yo.Views {
                     } else {
                         this.log(input.type + ".value => " + data);
                         input.value = data;
-                    }
-                } else if (element.tagName === "SELECT") {
-                    var sel = <HTMLSelectElement>element;
-                    for (var j = 0; j < sel.options.length; j++) {
-                        var opt = <HTMLOptionElement>sel.options[j];
-                        if (opt.value === data || opt.label === data) {
-                            this.log('setting option ' + opt.label + " to selected");
-                            opt.selected = true;
-                            break;
-                        }
                     }
                 } else if (element.tagName === "TEXTAREA") {
                     this.log('textarea => ' + data);
