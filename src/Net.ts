@@ -26,9 +26,10 @@ module Griffin.Yo.Net {
             }
             request.setRequestHeader("Content-Type", contentType);
             request.onload = () => {
+				var anyRequest = <any>request;
                 if (request.status >= 200 && request.status < 400) {
                     if (request.status === 304) {
-                        request["responseText"] = this.cache[url].content;
+                        anyRequest.responseText = this.cache[url].content;
                     } else {
                         const header: string = request.getResponseHeader("Last-Modified");
                         if (header) {
@@ -40,12 +41,8 @@ module Griffin.Yo.Net {
                     }
 
                     if (contentType === "application/json") {
-                        request["responseBody"] = JSON.parse(request.responseText);
-                        
-                        //for browser that locks well defined objects
-                        //(like IE)
-                        var tempFix:any = request;
-                        tempFix["responseJson"] = JSON.parse(request.responseText);
+                        anyRequest.responseBody = JSON.parse(request.responseText);
+                        anyRequest.responseJson = JSON.parse(request.responseText);
                     }
                     callback(request, true);
                 } else {
@@ -136,15 +133,15 @@ module Griffin.Yo.Net {
 
 
             request.onload = () => {
+				var anyRequest = <any>request;
                 if (request.status >= 200 && request.status < 400) {
                     var contentType = request.getResponseHeader("content-type").toLocaleLowerCase();
                     if (contentType === "application/json") {
                         //this doesn't work in IE
-                        request.responseBody = JSON.parse(request.responseText);
+                        anyRequest.responseBody = JSON.parse(request.responseText);
 
                         //for IE
-                        var temp = <any>request;
-                        temp["responseJson"] = JSON.parse(request.responseText);
+                        anyRequest.responseJson = JSON.parse(request.responseText);
                     }
                     callback(request, true);
                 } else {

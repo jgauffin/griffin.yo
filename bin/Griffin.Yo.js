@@ -178,16 +178,16 @@ var Griffin;
                     return arr;
                 };
                 FormReader.prototype.pullElement = function (container) {
-                    if (container.childElementCount === 0) {
-                        if (container.tagName == 'SELECT') {
-                            var select = container;
-                            if (select.selectedIndex == -1) {
-                                return null;
-                            }
-                            var value1 = select.options[select.selectedIndex];
-                            return this.processValue(value1.value);
+                    if (container.tagName == 'SELECT') {
+                        var select = container;
+                        if (select.selectedIndex == -1) {
+                            return null;
                         }
-                        else if (container.tagName == 'INPUT') {
+                        var value1 = select.options[select.selectedIndex];
+                        return this.processValue(value1.value);
+                    }
+                    if (container.childElementCount === 0) {
+                        if (container.tagName == 'INPUT') {
                             var input = container;
                             var typeStr = container.getAttribute('type');
                             if (typeStr === 'radio' || typeStr === 'checkbox') {
@@ -364,9 +364,10 @@ var Griffin;
                     }
                     request.setRequestHeader("Content-Type", contentType);
                     request.onload = function () {
+                        var anyRequest = request;
                         if (request.status >= 200 && request.status < 400) {
                             if (request.status === 304) {
-                                request["responseText"] = _this.cache[url].content;
+                                anyRequest.responseText = _this.cache[url].content;
                             }
                             else {
                                 var header = request.getResponseHeader("Last-Modified");
@@ -378,9 +379,8 @@ var Griffin;
                                 }
                             }
                             if (contentType === "application/json") {
-                                request["responseBody"] = JSON.parse(request.responseText);
-                                var tempFix = request;
-                                tempFix["responseJson"] = JSON.parse(request.responseText);
+                                anyRequest.responseBody = JSON.parse(request.responseText);
+                                anyRequest.responseJson = JSON.parse(request.responseText);
                             }
                             callback(request, true);
                         }
@@ -432,12 +432,12 @@ var Griffin;
                         }
                     }
                     request.onload = function () {
+                        var anyRequest = request;
                         if (request.status >= 200 && request.status < 400) {
                             var contentType = request.getResponseHeader("content-type").toLocaleLowerCase();
                             if (contentType === "application/json") {
-                                request.responseBody = JSON.parse(request.responseText);
-                                var temp = request;
-                                temp["responseJson"] = JSON.parse(request.responseText);
+                                anyRequest.responseBody = JSON.parse(request.responseText);
+                                anyRequest.responseJson = JSON.parse(request.responseText);
                             }
                             callback(request, true);
                         }
@@ -849,7 +849,10 @@ var Griffin;
                         if (!targetElem)
                             throw new Error("Failed to find target element '" + target + "' for navigation '" + nav.innerHTML + "'");
                         var ifStatement = nav.getAttribute("data-if");
-                        var ifResult = !ifStatement || !this.evalInContext(ifStatement, context);
+                        if (!ifStatement) {
+                            continue;
+                        }
+                        var ifResult = this.evalInContext(ifStatement, context);
                         if (!ifResult) {
                             nav.parentNode.removeChild(nav);
                             continue;
@@ -866,6 +869,9 @@ var Griffin;
                             continue;
                         }
                         var ifStatement = child.getAttribute("data-if");
+                        if (!ifStatement) {
+                            continue;
+                        }
                         var ifResult = this.evalInContext(ifStatement, context);
                         if (!ifResult) {
                             child.parentNode.removeChild(child);
@@ -958,7 +964,7 @@ var Griffin;
                                         continue;
                                     }
                                     var result = self.evalInContext(condition, { ctx: ctx, vm: vm });
-                                    if (!result) {
+                                    if (result) {
                                         elem.parentNode.removeChild(elem);
                                     }
                                 }
@@ -1269,7 +1275,18 @@ var Griffin;
                     if (elementName) {
                         this.log('renderElement', this.getName(element));
                     }
-                    if (element.childElementCount === 0 && elementName) {
+                    if (elementName && element.tagName === "SELECT") {
+                        var sel = element;
+                        for (var j = 0; j < sel.options.length; j++) {
+                            var opt = sel.options[j];
+                            if (opt.value === data || opt.label === data) {
+                                this.log('setting option ' + opt.label + " to selected");
+                                opt.selected = true;
+                                break;
+                            }
+                        }
+                    }
+                    else if (element.childElementCount === 0 && elementName) {
                         if (data && data.hasOwnProperty(elementName)) {
                             data = data[elementName];
                         }
@@ -1295,17 +1312,6 @@ var Griffin;
                             else {
                                 this.log(input.type + ".value => " + data);
                                 input.value = data;
-                            }
-                        }
-                        else if (element.tagName === "SELECT") {
-                            var sel = element;
-                            for (var j = 0; j < sel.options.length; j++) {
-                                var opt = sel.options[j];
-                                if (opt.value === data || opt.label === data) {
-                                    this.log('setting option ' + opt.label + " to selected");
-                                    opt.selected = true;
-                                    break;
-                                }
                             }
                         }
                         else if (element.tagName === "TEXTAREA") {

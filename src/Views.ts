@@ -66,8 +66,8 @@ module Griffin.Yo.Views {
                             opt.selected = true;
                             break;
                         }
-			}
-            else if (element.childElementCount === 0 && elementName) {
+					}
+			} else if (element.childElementCount === 0 && elementName) {
 				
 				// we are the bottom element, but the data is not at the bottom yet.
 				if (data && data.hasOwnProperty(elementName)) {

@@ -200,17 +200,16 @@ module Griffin.Yo.Dom {
 
 
 		private pullElement(container: HTMLElement): any {
-			//console.log(container, value3, container.childElementCount);
+			if (container.tagName == 'SELECT') {
+				var select = <HTMLSelectElement>container;
+				if (select.selectedIndex == -1) {
+					return null;
+				}
+				let value1 = <HTMLOptionElement>select.options[select.selectedIndex];
+				return this.processValue(value1.value);
+			} 
 			if (container.childElementCount === 0) {
-				if (container.tagName == 'SELECT') {
-					var select = <HTMLSelectElement>container;
-					if (select.selectedIndex == -1) {
-						return null;
-					}
-					let value1 = <HTMLOptionElement>select.options[select.selectedIndex];
-					return this.processValue(value1.value);
-				} else if (container.tagName == 'INPUT') {
-				
+				if (container.tagName == 'INPUT') {
 					var input = <HTMLInputElement>container;
 					var typeStr = container.getAttribute('type');
 					if (typeStr === 'radio' || typeStr === 'checkbox') {
@@ -479,9 +478,10 @@ module Griffin.Yo.Net {
             }
             request.setRequestHeader("Content-Type", contentType);
             request.onload = () => {
+				var anyRequest = <any>request;
                 if (request.status >= 200 && request.status < 400) {
                     if (request.status === 304) {
-                        request["responseText"] = this.cache[url].content;
+                        anyRequest.responseText = this.cache[url].content;
                     } else {
                         const header: string = request.getResponseHeader("Last-Modified");
                         if (header) {
@@ -493,12 +493,8 @@ module Griffin.Yo.Net {
                     }
 
                     if (contentType === "application/json") {
-                        request["responseBody"] = JSON.parse(request.responseText);
-                        
-                        //for browser that locks well defined objects
-                        //(like IE)
-                        var tempFix:any = request;
-                        tempFix["responseJson"] = JSON.parse(request.responseText);
+                        anyRequest.responseBody = JSON.parse(request.responseText);
+                        anyRequest.responseJson = JSON.parse(request.responseText);
                     }
                     callback(request, true);
                 } else {
@@ -589,15 +585,15 @@ module Griffin.Yo.Net {
 
 
             request.onload = () => {
+				var anyRequest = <any>request;
                 if (request.status >= 200 && request.status < 400) {
                     var contentType = request.getResponseHeader("content-type").toLocaleLowerCase();
                     if (contentType === "application/json") {
                         //this doesn't work in IE
-                        request.responseBody = JSON.parse(request.responseText);
+                        anyRequest.responseBody = JSON.parse(request.responseText);
 
                         //for IE
-                        var temp = <any>request;
-                        temp["responseJson"] = JSON.parse(request.responseText);
+                        anyRequest.responseJson = JSON.parse(request.responseText);
                     }
                     callback(request, true);
                 } else {
@@ -1199,7 +1195,11 @@ module Griffin.Yo.Spa {
 
 
                 var ifStatement = nav.getAttribute("data-if");
-                var ifResult = !ifStatement || !this.evalInContext(ifStatement, context);
+				if (!ifStatement){
+					continue;
+				}
+				
+                var ifResult = this.evalInContext(ifStatement, context);
                 if (!ifResult) {
                     nav.parentNode.removeChild(nav);
                     continue;
@@ -1219,6 +1219,10 @@ module Griffin.Yo.Spa {
 				}
 				
                 var ifStatement = child.getAttribute("data-if");
+				if (!ifStatement) {
+					continue;
+				}
+				
                 var ifResult = this.evalInContext(ifStatement, context);
                 if (!ifResult) {
                     child.parentNode.removeChild(child);
@@ -1330,8 +1334,10 @@ module Griffin.Yo.Spa {
 								continue;
 							}
 							
+							//unless is flux. for instance haveRows = true means that we should execute, i.e. remove the node
+							//so don't change the if statement to false.
                             let result = self.evalInContext(condition, { ctx: ctx, vm:vm });
-                            if (!result) {
+                            if (result) {
                                 elem.parentNode.removeChild(elem);
                             }
                         }
@@ -1854,7 +1860,18 @@ module Griffin.Yo.Views {
 			if (elementName) {
 				this.log('renderElement', this.getName(element));
 			}
-            if (element.childElementCount === 0 && elementName) {
+			
+			if (elementName && element.tagName === "SELECT") {
+                    var sel = <HTMLSelectElement>element;
+                    for (var j = 0; j < sel.options.length; j++) {
+                        var opt = <HTMLOptionElement>sel.options[j];
+                        if (opt.value === data || opt.label === data) {
+                            this.log('setting option ' + opt.label + " to selected");
+                            opt.selected = true;
+                            break;
+                        }
+					}
+			} else if (element.childElementCount === 0 && elementName) {
 				
 				// we are the bottom element, but the data is not at the bottom yet.
 				if (data && data.hasOwnProperty(elementName)) {
@@ -1882,16 +1899,6 @@ module Griffin.Yo.Views {
                     } else {
                         this.log(input.type + ".value => " + data);
                         input.value = data;
-                    }
-                } else if (element.tagName === "SELECT") {
-                    var sel = <HTMLSelectElement>element;
-                    for (var j = 0; j < sel.options.length; j++) {
-                        var opt = <HTMLOptionElement>sel.options[j];
-                        if (opt.value === data || opt.label === data) {
-                            this.log('setting option ' + opt.label + " to selected");
-                            opt.selected = true;
-                            break;
-                        }
                     }
                 } else if (element.tagName === "TEXTAREA") {
                     this.log('textarea => ' + data);

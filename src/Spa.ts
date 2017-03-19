@@ -89,7 +89,7 @@ module Griffin.Yo.Spa {
 
 
                 var ifStatement = nav.getAttribute("data-if");
-				if (!isStatement){
+				if (!ifStatement){
 					continue;
 				}
 				
@@ -228,8 +228,10 @@ module Griffin.Yo.Spa {
 								continue;
 							}
 							
+							//unless is flux. for instance haveRows = true means that we should execute, i.e. remove the node
+							//so don't change the if statement to false.
                             let result = self.evalInContext(condition, { ctx: ctx, vm:vm });
-                            if (!result) {
+                            if (result) {
                                 elem.parentNode.removeChild(elem);
                             }
                         }
