@@ -2,12 +2,11 @@
 <html lang="en">
     <head>
         <title>Complete</title>
-        <style>
-            #MyView div { margin: 10px; }
-            label { width: 100px; display: inline-block; text-align: right; }
-        </style>
+        <link rel="stylesheet" href="../css/site.css" />
+        <script src="../lib/demo.js"></script>
     </head>
     <body>
+		<h2>Complete form example</h2>
         <div id="Description">
             This sample shows how a form can be translated into a JSON object with a single line of code.
         </div>
@@ -71,12 +70,13 @@
                 <input type="text" name="[]" value="OneTrueError" /> 
                 <input type="text" name="[]" value="Griffin.Framework" />
             </div>
-            <button id="submit">Submit</button> 
         </div>
+		
         <script src="../../../bin/Griffin.Yo.js"> </script>
         <script id="example-script" type="text/javascript">
             var Yo = Griffin.Yo;
-            document.getElementById("submit").addEventListener("click", function(e) {
+            function invokeDemo()
+			{
             
                 //form to read
                 var form = new Yo.Dom.FormReader("MyView");
@@ -85,14 +85,8 @@
                 var dto = form.read();
                 
                 //finally display it
-                var node = document.createElement("div");
-                var json = JSON.stringify(dto, null, 4);
-                if (syntaxHighlight){
-                    json = syntaxHighlight(json);
-                }
-                node.innerHTML = "<h3>Result</h3><div>Pulled data: <pre>" + json + "</pre></div>";
-                document.getElementById('MyView').appendChild(node);
-            });
+				demoLog(dto);
+            }
 
         </script>
     </body>

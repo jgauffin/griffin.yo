@@ -1,33 +1,45 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <title>Table as child data</title>
-    </head>
-    <body>
-        <p id="Description">Rendering tables can be done for complex objects where the collection is a child</p>
-        <div id="MyView">
-            <h2 data-name="Title"></h2>
-            <table>
+<head>
+    <title>Table as child data</title>
+    <link rel="stylesheet" href="../css/site.css" />
+    <script src="../lib/demo.js"></script>
+</head>
+
+<body class="view-demo">
+    <p id="Description">Rendering tables can be done for complex objects where the collection is a child</p>
+    <div id="MyView">
+        <h2 data-name="Title"></h2>
+        <table>
+            <tr>
+                <th>Username</th>
+                <th>Age</th>
+                <th>&nbsp;</th>
+            </tr>
+            <tbody>
                 <tr data-collection="Items">
                     <td data-name="UserName"></td>
                     <td data-name="Age"></td>
                     <td data-name="State"></td>
                 </tr>
-            </table>
-        </div>
-        <script src="../../../bin/Griffin.Yo.js"></script>
-        <script id="example-script" type="text/javascript">
-            var Yo = Griffin.Yo;
-            var data = { Title: 'Hello world', 
-                         Items: [
-                            { UserName: 'Jonas', Age: '38', State: 'Kicking' },
-                            { UserName: 'Alfred', Age: '0.6', State: 'Crawling' }
-                        ]
-                    };
-            
+            </tbody>
+        </table>
+    </div>
+    <script src="../../../bin/Griffin.Yo.js"></script>
+    <script id="example-script" type="text/javascript">
+        var Yo = Griffin.Yo;
+        function invokeDemo() {
+            var data = {
+                Title: 'Hello world',
+                Items: [
+                    { UserName: 'Jonas', Age: '38', State: 'Kicking' },
+                    { UserName: 'Alfred', Age: '0.6', State: 'Crawling' }
+                ]
+            };
+
             //arrays as part of an object works just fine.
             Yo.G.render('MyView', data);
-            
-        </script>
-    </body>
+        }
+    </script>
+</body>
 </html>

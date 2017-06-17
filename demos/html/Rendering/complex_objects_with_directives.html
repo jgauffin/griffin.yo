@@ -4,81 +4,52 @@
 <head>
     <title>Rendering complex objects (with directives)</title>
     <link rel="stylesheet" href="../css/site.css" />
+    <script src="../lib/demo.js"></script>
 </head>
 
-<body>
+<body class="view-demo">
     <h1>Complex object, customized data</h1>
     <p id="Description">Sometimes the data that you recieve from the server side isn't a 100% match for the view. The easiest thing to do then
         is to modify it using directives.
     </p>
     <h2>View</h2>
-    <pre><code>&lt;div id="MyView">
-    &lt;h2 data-name="FirstName">&lt;/h2>
-    &lt;div data-name="Address">
-        &lt;span data-name="PostalCode">&lt;/span>
-        &lt;span data-name="City">&lt;/span>
-    &lt;/div>
-&lt;/div>
-        </code></pre>
-    <h2>Code</h2>
-    <pre><code>var data = { 
-    FirstName: "Jonas",
-    Address: {
-        City: "Falun",
-        PostalCode: "791 00"
-    }
-};
-
-// do not have to specify directives for everything.
-var directives = {
-    FirstName: { 
-        //second argument is the object at the current level.
-        text(value, dto) { return value + " [" + dto.Address.PostalCode + "]"; }
-    },
-    Address: {
-        City: {
-            //DTO = Address
-            html(value, dto) { return '&lt;' + value + '&gt;'; }
-        }
-    }
-};
-Griffin.Yo.G.render('MyView', data, directives);</code></pre>
-    <h2>Result</h2>
-    <div class="result">
-        <div id="MyView">
-            <h2 data-name="FirstName"></h2>
-            <div data-name="Address">
-                <span data-name="PostalCode"></span>
-                <span data-name="City"></span>
-            </div>
+    <div id="MyView">
+        <h2 data-name="FirstName"></h2>
+        <div data-name="Address">
+            <span data-name="PostalCode"></span>
+            <span data-name="City"></span>
         </div>
     </div>
+
     <script src="../lib/Griffin.Yo.js"></script>
     <script id="example-script" type="text/javascript">
         var Yo = Griffin.Yo;
-            
-        var data = { 
-            FirstName: "Jonas",
-            Address: {
-                City: "Falun",
-                PostalCode: "791 00"
-            }
-        };
-        
-        // do not have to specify directives for everything.
-        var directives = {
-            FirstName: { 
-                //second argument is the object at the current level.
-                text(value, dto) { return value + " [" + dto.Address.PostalCode + "]"; }
-            },
-            Address: {
-                City: {
-                    //DTO = Address
-                    html(value, dto) { return '&lt;' + value + '&gt;'; }
+
+        function invokeDemo() {
+
+            var data = {
+                FirstName: "Jonas",
+                Address: {
+                    City: "Falun",
+                    PostalCode: "791 00"
                 }
-            }
-        };
-        Yo.G.render('MyView', data, directives);
+            };
+
+            // do not have to specify directives for everything.
+            var directives = {
+                FirstName: {
+                    //second argument is the object at the current level.
+                    text(value, dto) { return value + " [" + dto.Address.PostalCode + "]"; }
+                },
+                Address: {
+                    City: {
+                        //DTO = Address
+                        html(value, dto) { return '&lt;' + value + '&gt;'; }
+                    }
+                }
+            };
+            Yo.G.render('MyView', data, directives);
+        }
     </script>
 </body>
 

@@ -21,3 +21,11 @@ pre {
 	float:left;
 }
 html, body { height: 100%; }
+
+#MyView {border: #999 1px dashed; margin-bottom: 20px;}
+#MyView table td{border: 1px solid #f0f0f0; padding: 5px;}
+
+label { width: 100px; display: inline-block; text-align: right; }
+
+#SourceCode{display: none;}
+

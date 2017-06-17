@@ -1,49 +1,30 @@
 <!doctype html>
 <html lang="en">
 
-    <head>
-        <title>Basic rendering</title>
-        <link rel="stylesheet" href="../css/site.css" />
-    </head>
+<head>
+    <title>Basic rendering</title>
+    <link rel="stylesheet" href="../css/site.css" />
+    <script src="../lib/demo.js"></script>
+</head>
 
-    <body>
-        <div id="menu"/>
-        <div id="content-wrapper">
-            <div id="Description">
-                <h1>Rendering data</h1>
-                <p>Server data (JSON objects) is a first class citizen in Griffin.Yo. Typically the information that you display for
+<body class="view-demo">
+    <h2>Basic rendering demo</h2>
+    <div id="Description">
+        <h1>Rendering data</h1>
+        <p>Server data (JSON objects) is a first class citizen in Griffin.Yo. Typically the information that you display for
             the user is generated server side. With Griffin.Yo it takes just one line of code to populate your view with
             it.
-                </p>
-            </div>
-            <h2>View</h2>
-            <pre><code>&lt;div id="MyView">
-    &lt;h2 data-name="Name"></h2>
-&lt;/div>
-            </pre></code>
-        <h2>Code</h2>
-        <pre><code>//from anywhere
-Griffin.Yo.G.render('MyView', { Name: 'Arne' });
-
-//from your view model
-context.render({ Name: 'Arne' });
-            </code></pre>
-        <h2>Result</h2>
-        <div class="result">
-
-            <div id="MyView">
-                <h2 data-name="Name"/>
-            </div>
-        </div>
+        </p>
     </div>
-    <div class="clearfix"/>
-    <script src="../lib/jquery-2.1.4.min.js"/>
+    <h3>View</h3>
+    <div id="MyView">
+        <h2 data-name="Name">
+    </div>
+
     <script src="../lib/Griffin.Yo.js"></script>
-    <script>
-        $("#menu").load("../menu.html");
-    </script>
     <script id="example-script" type="text/javascript">
-        var Yo = Griffin.Yo;
+        function invokeDemo() {
+            var Yo = Griffin.Yo;
 
             //either
             Yo.G.render('MyView', { Name: 'Arne' });
@@ -51,6 +32,7 @@ context.render({ Name: 'Arne' });
             // .. or ..
             var r = new Yo.Views.ViewRenderer('MyView');
             r.render({ Name: 'Arne2' });
+        }
     </script>
 </body>
 

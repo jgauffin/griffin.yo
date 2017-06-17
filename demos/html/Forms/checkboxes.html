@@ -1,57 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>Complete</title>
-        <style>
-            #MyView div { margin: 10px; }
-            label { width: 100px; display: inline-block; text-align: right; }
-        </style>
-        <link rel="stylesheet" href="../css/site.css" />
-    </head>
-    <body>
-        <h2>Checkboxes</h2>
-        <div id="Description">
-            Shows how different values are being treated when checkboxes are parsed
+
+<head>
+    <title>Checkboxes</title>
+    <link rel="stylesheet" href="../css/site.css" />
+    <script src="../lib/demo.js"></script>
+</head>
+
+<body>
+    <h2>Checkboxes</h2>
+    <div id="Description">
+        Shows how different values are being treated when checkboxes are parsed
+    </div>
+
+
+    <h3>View</h3>
+    <div id="MyView">
+        <div>
+            <label>String values</label>
+            <input type="checkbox" name="Favorites" value="Typescript" checked="checked" /> Typescript
+            <input type="checkbox" name="Favorites" value="Javascript" checked="checked" /> Javascript
+            <input type="checkbox" name="Favorites" value="C#" /> C#
         </div>
-        <h3>View</h3>
-        <div id="MyView">
-            <div>
-                <label>String values</label> 
-                <input type="checkbox" name="Favorites" value="Typescript" checked="checked" /> Typescript 
-                <input type="checkbox" name="Favorites" value="Javascript" checked="checked" /> Javascript 
-                <input type="checkbox" name="Favorites" value="C#" /> C#
-            </div>
-            <div>
-                <label>Boolean values</label> 
-                <input type="checkbox" name="Bool1" value="true" checked="checked" /> Converting string to "bool" type
-            </div>
+        <div>
+            <label>Boolean values</label>
+            <input type="checkbox" name="Bool1" value="true" checked="checked" /> Converting string to "bool" type
         </div>
-        <button id="test">Test</button>
-        <script src="../../../bin/Griffin.Yo.js"> </script>
-        <h3>Result</h3>
-        <div id="result"></div>
-        <script id="example-script" type="text/javascript">
+    </div>
+
+    <script src="../../../bin/Griffin.Yo.js"></script>
+    <script id="example-script" type="text/javascript">
+        function invokeDemo() {
             var Yo = Griffin.Yo;
 
             //form to read
             var form = new Yo.Dom.FormReader("MyView");
-            
+
             //get the JSON object
             var dto = form.read();
-            
-            //finally display it
-            var node = document.createElement("div");
-            var json = JSON.stringify(dto, null, 4);
-            if (typeof syntaxHighlight !== "undefined"){
-                json = syntaxHighlight(json);
-            }
-            node.innerHTML = "<pre>" + json + "</pre>";
-            document.getElementById('result').appendChild(node);
 
-            document.getElementById("test").addEventListener("click", function(e) {
-                var html=document.getElementById("MyView").innerHTML;
-                document.getElementById("MyView").innerHTML = '<pre><code>' + html.replace(/\</g, "&lt;").replace(/            /g, '') + '</code></pre>';
-            });
-        </script>
-    </body>
+            demoLog(dto);
+        }
+    </script>
+</body>
+
 </html>
