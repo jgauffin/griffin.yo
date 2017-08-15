@@ -3,58 +3,54 @@
     ViewBag.Title = "Demos - " + Model.Title;
 }
 <style>
-    .null, .boolean { color: blue; font-weight: bold; }
-    .number {color:red;}
-    .string {color: green }
-    .key { font-weight: bold;}
+    .null, .boolean {
+        color: blue;
+        font-weight: bold;
+    }
+
+    .number {
+        color: red;
+    }
+
+    .string {
+        color: green
+    }
+
+    .key {
+        font-weight: bold;
+    }
+
+    ul.file-tree, .file-tree ul {
+        list-style-type: none;
+        padding-left: 10px;
+    }
+
+        ul.file-tree li, .file-tree ul li {
+            list-style-type: none;
+        }
+        .file-tree .fa-file {
+            cursor: pointer;
+            color: blue;
+        }
+    .file-tree li[data-path] {
+        cursor: pointer;
+    }
 </style>
-<h2>@Model.Title</h2>
-<div class="description">
-    <em>
-        @Model.Description
-    </em>
-</div>
-
-<h2>Main view</h2>
-<div id="View">
-    <pre><code class="html">@Model.View</code></pre>
-</div>
-
-<h2>SPA setup</h2>
-<div id="Script">
-    <pre><code class="javascript">@Model.Script</code></pre>
-</div>
 
 <h2>Example file browser</h2>
-<div class="container">
-    <div class="row">
-        <div class="col-lg-4" style="overflow: scroll" id="example-files">
-            @foreach (var file in Model.Files)
-            {
-                <a href="@file">@file</a><br/>
-            }
-        </div>
-        <div class="col-lg-8" id="file-content">
-            
-        </div>
+<div class="row" style="min-height: 0.7vh">
+    <div class="col-lg-4" style="overflow: scroll" id="example-files">
+        <ul class="main-files">
+            <li></li>
+        </ul>
+        @Html.Raw(Model.Files.GenerateList())
+    </div>
+    <div class="col-lg-8" id="file-content">
+
     </div>
 </div>
-<h2>View (for model)</h2>
-<div id="ModelView">
-    <pre><code class="html"></code></pre>
 
-</div>
 
-<h2>ViewModel</h2>
-<div id="ViewModel">
-    <pre><code class="javascript"></code></pre>
-</div>
-
-<h2>Demo</h2>
-<hr />
-<div id="MyView">
-    @Html.Raw(Model.View)
-</div>
 @section scripts
 {
     <script>
@@ -83,6 +79,9 @@
             $('pre code').each(function (i, block) {
                 hljs.highlightBlock(block);
             });
+        });
+        $('#example-files li[data-path=*]').click(function(e) {
+            console.log(this);
         });
         var routeName = '@Model.RouteSection';
         $('#example-files')

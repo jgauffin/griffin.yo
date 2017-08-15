@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.AccessControl;
-using System.Web;
 using System.Web.Mvc;
 using Web.Models;
 
@@ -28,6 +25,16 @@ namespace Web.Controllers
             return Content(model, "application/javascript");
         }
 
+        [Route("sample/resource/{sampleName}/{*path}")]
+        public ActionResult Resource(string sampleName, string path)
+        {
+            path = path.Replace(".", "").Replace("\\", "/").Replace(":", "");
+
+            var reader = new ExampleReader();
+            var contents = reader.GetSampleFile(sampleName, path);
+            return Content(contents, "text/plain");
+        }
+
         [Route("sample/{name}")]
         public ActionResult Sample(string name)
         {
@@ -35,7 +42,7 @@ namespace Web.Controllers
             var samples= reader.Read().ToList();
             ViewBag.Samples = samples;
             var sample = samples.FirstOrDefault(x => x.Filename == name);
-            if (sample != null && sample.Section == "Spa")
+            if (sample != null && sample.Section.Equals("Spa", StringComparison.OrdinalIgnoreCase))
                 return RenderSpa(sample);
 
             return View(sample);

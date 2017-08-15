@@ -1,27 +1,34 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <title>Basic demo</title>
-    </head>
-    <body>
-        <div id="Description">
-            Minimal configuration to get the SPA engine running.
-        </div>
-        <div id="YoView">
-        </div>
-        <script src="../lib/Griffin.Yo.js"></script>
-        <script id="example-script" type="text/javascript" >
-            var Yo = Griffin.Yo;
-            console.log(window.location.pathname);
-            
+
+<head>
+    <title>Basic demo</title>
+</head>
+
+<body>
+    <div id="Description">
+        Minimal configuration to get the SPA engine running.
+    </div>
+
+    <div id="YoView">
+    </div>
+
+    <script src="../lib/Griffin.Yo.js"></script>
+    <script id="example-script" type="text/javascript">
+        var Yo = Griffin.Yo;
+        function invokeDemo() {
             var spa = new Yo.Spa.SpaEngine("BasicApp");
-            
+
             // not required for pure SPA applications
             spa.root = window.location.pathname;
-            
-            // tell which view model to load
+
+            // map the one route that we got
             spa.mapRoute("/", "Home/Index");
+
+            //run default route ("/").
             spa.run();
-        </script>
-    </body>
+        }
+    </script>
+</body>
+
 </html>

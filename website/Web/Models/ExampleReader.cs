@@ -73,7 +73,7 @@ namespace Web.Models
                 view = view.Replace("\r\n			", "");
                 view = view.Replace("\r\n            ", "");
 
-                var files = GenerateFileList(dir);
+                var rootFileNode = GenerateFileList(dir);
 
                 string routeSection = null;
                 string script = null;
@@ -94,35 +94,34 @@ namespace Web.Models
                     Filename = Path.GetFileNameWithoutExtension(file),
                     Section = "SPA",
                     RouteSection = routeSection,
-                    Files = files
+                    Files = rootFileNode
                 };
             }
 
         }
 
-        private static List<string> GenerateFileList(string dir)
+        private static FileNode GenerateFileList(string dir)
         {
-            List<string> files = new List<string>();
+            var root= new FileNode() ;
             foreach (var subdir in Directory.GetDirectories(dir))
             {
-                GenerateFileList(dir, subdir, files);
+                GenerateFileList(dir, subdir, root);
             }
-            return files;
+            return root;
         }
 
-        private static List<string> GenerateFileList(string rootDir, string dir, List<string> files)
+        private static void GenerateFileList(string rootDir, string dir, FileNode root)
         {
-            foreach (var subFile in Directory.GetFiles(rootDir))
+            foreach (var subFile in Directory.GetFiles(dir))
             {
-                var name = subFile.Remove(0, rootDir.Length + 1);
-                files.Add(name);
+                var name = subFile.Remove(0, rootDir.Length).Replace('\\', '/');
+                root.AddPath(name);
             }
 
             foreach (var subdir in Directory.GetDirectories(dir))
             {
-                GenerateFileList(rootDir, subdir, files);
+                GenerateFileList(rootDir, subdir, root);
             }
-            return files;
         }
 
         public IEnumerable<CodeSample> Read()
@@ -158,6 +157,12 @@ namespace Web.Models
         {
             var directory = Path.Combine(DemoDirectory, "Spa", sample.Filename, "ViewModels", modelName + "ViewModel.js");
             return File.ReadAllText(directory);
+        }
+
+        public string GetSampleFile(string sampleName, string path)
+        {
+            var fullPath = Path.Combine(DemoDirectory, sampleName, path);
+            return File.ReadAllText(fullPath);
         }
     }
 }

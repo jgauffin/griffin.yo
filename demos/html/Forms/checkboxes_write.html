@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Checkboxes</title>
+    <link rel="stylesheet" href="../css/site.css" />
+    <script src="../lib/demo.js"></script>
+</head>
+
+<body>
+    <h2>Checkboxes</h2>
+    <div id="Description">
+        Writes an array as checkboxes.
+    </div>
+
+
+    <h3>View</h3>
+    <div id="MyView">
+        <div>
+            <label>String values</label>
+            <div data-collection="Favorites">
+                <input type="checkbox" name="Favorites" value="Typescript" checked="checked" /> Typescript
+                <input type="checkbox" name="Favorites" value="Javascript" checked="checked" /> Javascript
+                <input type="checkbox" name="Favorites" value="C#" /> C#
+            </div>
+        </div>
+        <div>
+            <label>Boolean values</label>
+            <input type="checkbox" name="Bool1" value="true" checked="checked" /> Converting string to "bool" type
+        </div>
+    </div>
+
+    <script src="../../../bin/Griffin.Yo.js"></script>
+    <script id="example-script" type="text/javascript">
+        function invokeDemo() {
+            var Yo = Griffin.Yo;
+
+            var data = {
+                Favorites: ['Typescript', 'C#'],
+                Bool1: false
+            }
+
+            var renderer = new Yo.Views.ViewRenderer("MyView");
+            renderer.render("MyView", data);
+
+        }
+    </script>
+</body>
+
+</html>
